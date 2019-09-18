@@ -362,28 +362,201 @@ let copy = product.clone()
 
 - [策略模式](#策略模式)
 - [模版模式](#模版模式)
-- [观察者模式](#观察者模式)
-- [迭代器模式](#迭代器模式)
-- [责任链模式](#责任链模式)
-- [命令模式](#命令模式)
-- [备忘录模式](#备忘录模式)
+- [适配器模式](#适配器模式)
+- [桥接模式](#桥接模式)
 - [状态模式](#状态模式)
 - [访问者模式](#访问者模式)
 - [中介者模式](#中介者模式)
 
 ### 策略模式
 
+描述：策略模式属于对象的行为模式，将某一组算法封装起来，让它们可以相互替换，策略模式提供了一种可插入式算法的实现方案
+
+```swift
+protocol Strategy {
+    func saveData()
+}
+
+class MemoryStrategy: Strategy {
+    func saveData() {
+        print("save data to memory")
+    }
+}
+
+class DiskStrategy: Strategy {
+    func saveData() {
+        print("save data to disk")
+    }
+}
+
+class Downloader {
+    let strategy: Strategy
+    init(strategy: Strategy) {
+        self.strategy = strategy
+    }
+    
+    func download() {
+        self.strategy.saveData()
+    }
+}
+
+Downloader(strategy: MemoryStrategy()).download()
+Downloader(strategy: DiskStrategy()).download()
+```
+
+如上，当我们调用下载方法时期望能够制定我们下载后的缓存策略
+
+优点：
+
+- 符合开闭原则，能够灵活的增加和修改实现
+- 提供了算法复用的实现
+
+缺点：
+
+- 需要自定义策略支持
+- 策略过多会在选择上花费一些功夫
+
 ### 模版模式
 
-### 观察者模式
+描述：模版模式将常见的方法抽象出来，每个成员单独去实现模版中的方法，大多语言的实现可以通过虚基类来实现，在Swift中我们可以使用协议来完成
 
-### 迭代器模式
+```swift
+protocol Create {
+    func createProduction()
+}
 
-### 责任链模式
+class Factory: Create {
+    func createProduction() {
+        print("all production created")
+    }
+}
 
-### 命令模式
+class Worker: Create {
+    func createProduction() {
+        print("product created")
+    }
+}
 
-### 备忘录模式
+Worker().createProduction()
+
+Factory().createProduction()
+```
+
+对于`createProduction`这个方法就是如此，成员只需遵守协议，具体实现内部自己处理
+
+优点：
+
+- 将不变的行为封装起来，避免重复定义
+- 方便更改和扩展具体的实现
+
+缺点：
+
+- 抽象容易导致歧义，子类有可能不完全符合模版的方法声明
+
+
+
+### 适配器模式
+
+描述：将一个类的接口转化为使用者希望的接口，适配器模式使得原本无法共同工作的类能够一起工作
+
+```swift
+protocol Greeting {
+    func sayHI()
+}
+
+struct Person: Greeting {
+    func sayHI() {
+        print("HI")
+    }
+}
+
+struct Dog {
+    func bark() {
+        print("BarkBark")
+    }
+}
+
+let person1 = Person()
+let person2 = Person()
+
+let dog1 = Dog()
+
+person1.sayHI()
+person2.sayHI()
+dog1.bark()
+```
+
+这时我们希望dog也能使用同样的sayHI方法，这里我们可以使用Swift的extension来完成适配器模式
+
+```swift
+let dog1 = Dog()
+
+extension Dog: Greeting {
+    func sayHI() {
+        bark()
+    }
+}
+
+person1.sayHI()
+person2.sayHI()
+dog1.sayHI())
+```
+
+优点：
+
+- 通过适配器重用原方法，无需改动原类
+- 增加了类的透明性和适用性
+- 灵活，可扩展，符合开闭原则
+
+缺点：
+
+- 对于无多继承和extension这种东西的语言实现起来较复杂
+
+### 桥接模式
+
+描述：将抽象部分与实现部分分离，使之都能独立的变化，又称作接口模式
+
+```swift
+protocol Action {
+    func happened()
+}
+
+protocol Animal {
+    var action: Action? { get }
+    func walk()
+}
+
+
+struct People: Animal {
+    var action: Action?
+    func walk() {
+        print("Person walk")
+        action?.happened()
+    }
+}
+
+struct Jump: Action {
+    func happened() {
+        print("Jump")
+    }
+}
+
+let person = People(action: Jump())
+person.walk()
+```
+
+可以看到，人在走路的时候会发生action，action在内部是抽象的，由外部控制
+
+优点：
+
+- 分离接口抽象以及实现部分
+- 替代多继承的一种解决方案
+- 桥接模式提高了系统的可扩展性
+- 可以对调用方隐藏实现细节
+
+缺点：
+
+- 关联关系建立在抽象层，增加了系统的设计难度
 
 ### 状态模式
 
@@ -393,23 +566,29 @@ let copy = product.clone()
 
 ## 行为型模式
 
-- [适配器模式](#适配器模式)
+- [观察者模式](观察者模式)
+- [备忘录模式](备忘录模式)
+- [迭代器模式](迭代器模式)
+- [责任链模式](责任链模式)
 - [装饰器模式](#装饰器模式)
 - [代理模式](#代理模式)
 - [外观模式](#外观模式)
-- [桥接模式](#桥接模式)
 - [组合模式](#组合模式)
 - [享元模式](#享元模式)
 
-### 适配器模式
+### 观察者模式
+
+### 备忘录模式
+
+### 迭代器模式
+
+#### 责任链模式
 
 ### 装饰器模式
 
 ### 代理模式
 
 ### 外观模式
-
-### 桥接模式
 
 ### 组合模式
 
