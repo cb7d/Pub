@@ -19,4 +19,5 @@
 - [Clang](https://github.com/FelixScat/ClangTest)
 - [AFNetworking](https://github.com/FelixScat/demo_AFN)
 - [Aspects](https://github.com/FelixScat/demo_Aspects)
+- [SDWebImage](https://github.com/FelixScat/demo_SDWebImage)
 
