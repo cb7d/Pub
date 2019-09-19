@@ -360,61 +360,13 @@ let copy = product.clone()
 
 ## 结构型模式
 
-- [策略模式](#策略模式)
 - [模版模式](#模版模式)
 - [适配器模式](#适配器模式)
 - [桥接模式](#桥接模式)
-- [状态模式](#状态模式)
-- [访问者模式](#访问者模式)
-- [中介者模式](#中介者模式)
-
-### 策略模式
-
-描述：策略模式属于对象的行为模式，将某一组算法封装起来，让它们可以相互替换，策略模式提供了一种可插入式算法的实现方案
-
-```swift
-protocol Strategy {
-    func saveData()
-}
-
-class MemoryStrategy: Strategy {
-    func saveData() {
-        print("save data to memory")
-    }
-}
-
-class DiskStrategy: Strategy {
-    func saveData() {
-        print("save data to disk")
-    }
-}
-
-class Downloader {
-    let strategy: Strategy
-    init(strategy: Strategy) {
-        self.strategy = strategy
-    }
-    
-    func download() {
-        self.strategy.saveData()
-    }
-}
-
-Downloader(strategy: MemoryStrategy()).download()
-Downloader(strategy: DiskStrategy()).download()
-```
-
-如上，当我们调用下载方法时期望能够制定我们下载后的缓存策略
-
-优点：
-
-- 符合开闭原则，能够灵活的增加和修改实现
-- 提供了算法复用的实现
-
-缺点：
-
-- 需要自定义策略支持
-- 策略过多会在选择上花费一些功夫
+- [装饰模式](#装饰模式)
+- [外观模式](#外观模式)
+- [享元模式](#享元模式)
+- [代理模式](#代理模式)
 
 ### 模版模式
 
@@ -558,41 +510,691 @@ person.walk()
 
 - 关联关系建立在抽象层，增加了系统的设计难度
 
-### 状态模式
+### 装饰模式
 
-### 访问者模式
+描述：动态地给一个对象添加一些额外的职责。就增加功能来说，装饰器模式相比生成子类更为灵活。
 
-### 中介者模式
+```swift
+protocol Component {
+    func method() -> String
+}
 
-## 行为型模式
+protocol Decorator: Component {
+    var component: Component { get }
+}
 
-- [观察者模式](观察者模式)
-- [备忘录模式](备忘录模式)
-- [迭代器模式](迭代器模式)
-- [责任链模式](责任链模式)
-- [装饰器模式](#装饰器模式)
-- [代理模式](#代理模式)
-- [外观模式](#外观模式)
-- [组合模式](#组合模式)
-- [享元模式](#享元模式)
+struct Coffee: Component {
+    func method() -> String {
+        return "making coffee"
+    }
+}
 
-### 观察者模式
+struct Sugar: Decorator {
+    func method() -> String {
+        return component.method() + " " + "add sugar"
+    }
+    
+    var component: Component
+}
 
-### 备忘录模式
+struct Milk: Decorator {
+    func method() -> String {
+        return component.method() + " " + "add milk"
+    }
+    
+    var component: Component
+}
 
-### 迭代器模式
+print(Milk(component: Sugar(component: Coffee())).method())
+```
 
-#### 责任链模式
+这里我们给咖啡加料，在加料有很多的情况下我们使用装饰模式就会很方便，在进行功能扩展的时候比子类化要灵活许多。装饰器模式主要的原理就在于将需要扩展的对象进行包装，并实现与该对象相同的接口，并在将任务传递给被包装的对象之前加入自己的行为。
 
-### 装饰器模式
+优点：
 
-### 代理模式
+- 比子类化的方案要灵活
+- 可以创建多种排列组合
+- 组件类和装饰器类可以独立变化
+
+缺点：
+
+- 经过多层装饰的对象在排查错误的时候比较复杂
 
 ### 外观模式
 
-### 组合模式
+描述：外部与一个子系统的通信必须通过一个统一的外观对象进行，为子系统中的一组接口提供一个一致的界面，外观模式定义了一个高层接口，这个接口使得这一子系统更加容易使用。外观模式又称为门面模式，它是一种对象结构型模式。
+
+```swift
+protocol Component {
+    func method() -> String
+}
+
+protocol Decorator: Component {
+    var component: Component { get }
+}
+
+struct Coffee: Component {
+    func method() -> String {
+        return "making coffee"
+    }
+}
+
+struct Sugar: Decorator {
+    func method() -> String {
+        return component.method() + " " + "add sugar"
+    }
+    
+    var component: Component
+}
+
+struct Milk: Decorator {
+    func method() -> String {
+        return component.method() + " " + "add milk"
+    }
+    
+    var component: Component
+}
+
+print(Milk(component: Sugar(component: Coffee())).method())
+
+struct Store {
+    func saleCoffee() -> Component {
+        return Milk(component: Sugar(component: Coffee()))
+    }
+}
+
+Store().saleCoffee().method()
+```
+
+外观模式主要提供一个接口，外部的使用者去调用接口返回结果而不必关心内部系统的实现，还是以咖啡为例，顾客去购买咖啡只需调用商店的卖出方法，内部如何实现交给子系统
+
+优点：
+
+- 对客户屏蔽内部系统，客户代码将变得简单
+- 实现了松耦合的关系
+- 降低了大型系统中的编译依赖性
+
+缺点：
+
+- 不能很好地限制客户使用子系统类，如果对客户访问子系统类做太多的限制则减少了可变性和灵活性。
+- 在不引入抽象外观类的情况下，增加新的子系统可能需要修改外观类或客户端的源代码，违背了“开闭原则”。
 
 ### 享元模式
+
+描述：享元模式（Flyweight Pattern）主要用于减少创建对象的数量，以减少内存占用和提高性能。这种类型的设计模式属于结构型模式，它提供了减少对象数量从而改善应用所需的对象结构的方式。
+
+这里主要可以参考UITableViewCell的重用机制，Cell的展示会发生变化，但是屏幕上能够展示出来的Cell是有限个的，利用重用机制可以很好的减少内存开销
+
+优点：
+
+- 较少的内存占用
+- 享元对象能够在不同环境中共享
+
+缺点：
+
+- 享元对象需要区分内外状态
+- 享元对象的状态外部化会使得读取外部状态的运行时间变长
+
+### 代理模式
+
+描述：给某一个对象提供一个代 理，并由代理对象控制对原对象的引用。代理模式的英 文叫做Proxy或Surrogate，它是一种对象结构型模式
+
+```swift
+protocol Guarder {
+    func guardTheEntrance()
+}
+
+class Dog: Guarder {
+    func guardTheEntrance() {
+        print("看家中...")
+    }
+}
+
+class Person {
+    
+    var guarder: Guarder
+    
+    init(guarder: Guarder) {
+        self.guarder = guarder
+    }
+    
+    func leaveHome() {
+        guarder.guardTheEntrance()
+    }
+}
+
+Person(guarder: Dog()).leaveHome()
+```
+
+代理模式就是类本身需要实现某种功能，但是为了降低耦合度本身不去实现，而是委托给其他类去实现
+
+优点：
+
+- 代理模式能够协调调用者和被调用者，在一定程度上降低了系 统的耦合度。
+
+缺点：
+
+- 一定程度上加大了系统的内存开销
+
+## 行为型模式
+
+- [责任链模式](#责任链模式)
+- [命令模式](#命令模式)
+- [解释器模式](#解释器模式)
+- [迭代器模式](#迭代器模式)
+- [中介者模式](#中介者模式)
+- [观察者模式](#观察者模式)
+- [状态模式](#状态模式)
+- [备忘录模式](#备忘录模式)
+- [策略模式](#策略模式)
+
+### 责任链模式
+
+描述：避免请求发送者与接收者耦合在一起，让多个对象都有可能接收请求，将这些对象连接成一条链，并且沿着这条链传递请求，直到有对象处理它为止。
+
+```swift
+protocol Leader {
+    
+    var leader: Leader? { get }
+    
+    func accept() -> Bool
+}
+
+class Employee: Leader {
+    var leader: Leader?
+    
+    init(leader: Leader?) {
+        self.leader = leader
+    }
+    
+    func accept() -> Bool {
+        print("deal with thing")
+        return true && leader?.accept() ?? true
+    }
+}
+
+let leader1 = Employee(leader: nil)
+let leader2 = Employee(leader: leader1)
+let leader3 = Employee(leader: leader2)
+
+leader3.accept()
+```
+
+比如你要向领导请假，需要一级一级的同意，如上。UIKit的touch事件就应用了责任链模式，使得点击事件能够不断传递。
+
+优点：
+
+- 使得客户端与具体响应者能够松耦合
+- 方便响应者更新响应的方法
+
+缺点：
+
+- 由于存在响应链条，处理起来的资源占用可能增加
+
+### 命令模式
+
+描述：将一个请求封装成一个对象，从而使用户可以用不同的请求对客户进行参数化。
+
+命令模式有两个特点：
+
+- 命令逻辑化，命令的逻辑可以由外部传入或内部实现
+- 支持撤销命令（undo）
+
+```swift
+protocol Command {
+    var operation: () -> Void { get }
+    var undoOperation: () -> Void { get }
+}
+
+struct WashCommand: Command {
+    var operation: () -> Void
+    var undoOperation: () -> Void
+}
+
+struct Person {
+    var command: Command
+    func execute() {
+        command.operation()
+    }
+    func undo() {
+        command.undoOperation()
+    }
+}
+
+let washCommand = WashCommand(operation: {
+    print("wash clothes")
+}) {
+    print("put clothed into sky")
+}
+
+let person = Person(command: washCommand)
+
+person.execute()
+
+person.undo()
+```
+
+优点：
+
+- 适合组合命令来实现复杂功能
+
+缺点：
+
+- 每个命令都需要具体的类来执行，会创建大量的命令类
+
+### 解释器模式
+
+描述：给定一个语言，定义它的文法的一种表示，并定义一个解释器，这个解释器使用该表示来解释语言中的句子。
+
+```swift
+protocol Expression {
+    func eval(context: String) -> Int
+}
+
+struct AddCalculator: Expression {
+    func eval(context: String) -> Int {
+        return context.components(separatedBy: "+").compactMap{ Int($0) }.reduce(0, +)
+    }
+}
+
+AddCalculator().eval(context: "1+1")
+```
+
+优点：
+
+- 解释器扩展性强
+
+缺点：
+
+- 在解释执行的时候往往会采用递归的形式，效率较低
+
+### 迭代器模式
+
+描述：提供一种方法顺序访问一个聚合对象中各个元素, 而又无须暴露该对象的内部表示。
+
+```swift
+struct Product {
+    let id: Int
+}
+
+protocol Iterator {
+    func hasNext() -> Bool
+    func next() -> Product?
+}
+
+class Store: Iterator {
+    
+    var products: [Product]
+    var index = 0;
+    
+    init(products: [Product]) {
+        self.products = products
+    }
+    
+    func hasNext() -> Bool {
+        return products.count > index
+    }
+    func next() -> Product? {
+        defer {
+            index += 1
+        }
+        
+        return products[index]
+    }
+}
+
+let store = Store(products: Array(1...100_).map{ Product(id: $0) })
+
+while store.hasNext() {
+    print(store.next()!)
+}
+```
+
+与责任链相比，迭代器更加强调一次完整的遍历，商店只要有货物就会去销售获取，而责任链是随时可以中断的，比较强调响应者的概念
+
+优点：
+
+- 简化了集合的遍历方式
+- 可以为某一个集合提供多种便利方式
+
+缺点：
+
+- 对于简单的集合类型来说增加了复杂度
+
+### 中介者模式
+
+描述：用一个中介对象来封装一系列的对象交互，中介者使各对象不需要显式地相互引用，从而使其耦合松散，而且可以独立地改变它们之间的交互。中介者模式又称为调停者模式，它是一种对象行为型模式。
+
+```swift
+class Colleague {
+    let name: String
+    let mediator: Mediator
+    
+    init(name: String, mediator: Mediator) {
+        self.name = name
+        self.mediator = mediator
+    }
+    
+    /**
+     发送消息
+     
+     - parameter message: 消息
+     */
+    func send(message: String) {
+        print("Colleague \(name) send: \(message)")
+        mediator.send(message: message, colleague: self)
+    }
+    
+    /**
+     接收消息
+     
+     - parameter message: 消息
+     */
+    func receive(message: String) {
+        assert(false, "Method should be overriden")
+    }
+}
+
+/**
+ *  中介者接口
+ */
+protocol Mediator {
+    /**
+     发送消息
+     
+     - parameter message:   消息
+     - parameter colleague: 发送者
+     */
+    func send(message: String, colleague: Colleague)
+}
+
+/// 具体中介者
+class MessageMediator: Mediator {
+    private var colleagues: [Colleague] = []
+    
+    func addColleague(colleague: Colleague) {
+        colleagues.append(colleague)
+    }
+    
+    func send(message: String, colleague: Colleague) {
+        for c in colleagues {
+            if c !== colleague { //for simplicity we compare object references
+                c.receive(message: message)
+            }
+        }
+    }
+}
+
+/// 具体对象
+class ConcreteColleague: Colleague {
+    override func receive(message: String) {
+        print("Colleague \(name) received: \(message)")
+    }
+}
+
+let messagesMediator = MessageMediator()
+let c1 = ConcreteColleague(name: "A", mediator: messagesMediator)
+let c2 = ConcreteColleague(name: "B", mediator: messagesMediator)
+let c3 = ConcreteColleague(name: "C", mediator: messagesMediator)
+messagesMediator.addColleague(colleague: c1)
+messagesMediator.addColleague(colleague: c2)
+messagesMediator.addColleague(colleague: c3)
+
+c3.send(message: "Hello")
+```
+
+我们在工程中模块化解耦的方式就是使用了中介者模式。和观察者模式很像，区别在于观察者是不关心接受方的广播，中介者是介入两个（或多个）对象之间的定点消息传递。
+
+优点：
+
+- 模块化解耦
+- 减少了子类的产生
+- 简化了对象间的交互
+
+缺点：
+
+- 中介者本省容易变得臃肿
+
+### 观察者模式
+
+描述：定义对象间的一种一对多依赖关系，使得每当一个对象状态发生改变时，其相关依赖对象皆得到通知并被自动更新。观察者模式又叫做发布-订阅（Publish/Subscribe）模式、模型-视图（Model/View）模式、源-监听器（Source/Listener）模式或从属者（Dependents）模式。
+
+```swift
+protocol Observer {
+    func receiveChanges()
+    func hashValue() -> Int
+}
+
+extension Observer {
+    
+    func hashValue() -> Int {
+        return Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque().hashValue
+    }
+}
+
+protocol Observable {
+    var observers: [Observer] { get }
+    func add(observer: Observer)
+    func remove(observer: Observer)
+    func notify()
+}
+
+class ConcreteObserver: Observer {
+    let name: String
+    
+    init(name: String) {
+        self.name = name
+    }
+    func receiveChanges() {
+        print("\(name) receive")
+    }
+}
+
+class ConcreteObservable: Observable {
+    
+    var observers: [Observer] = []
+    
+    func add(observer: Observer) {
+        observers.append(observer)
+    }
+    
+    func remove(observer: Observer) {
+        
+        guard let idx = observers.firstIndex(where: { (obs) -> Bool in
+            return obs.hashValue() == observer.hashValue()
+        }) else { return  }
+        
+        observers.remove(at: idx)
+    }
+    
+    func notify() {
+        
+        observers.forEach{
+            $0.receiveChanges()
+        }
+    }
+}
+
+let c1 = ConcreteObserver(name: "A")
+let c2 = ConcreteObserver(name: "B")
+let c3 = ConcreteObserver(name: "C")
+
+let observable = ConcreteObservable()
+observable.add(observer: c1)
+observable.add(observer: c2)
+observable.add(observer: c3)
+
+observable.notify()
+
+observable.remove(observer: c1)
+observable.notify()
+```
+
+在Cocoa框架中提供的[KVO](https://k.felixplus.top/kvo/)和通知中心就是观察者模式的实现。
+
+优点：
+
+- 可以实现表示层和数据逻辑层分离
+- 支持广播通信
+
+缺点：
+
+- 将所有观察者都通知到会花费一些时间
+- 需要注意循环依赖的事件发生
+
+### 状态模式
+
+描述：允许对象在内部状态发生改变时改变它的行为，对象看起来好像修改了它的类。
+
+```swift
+protocol State {
+    func doStuff()
+}
+
+class StateA: State {
+    func doStuff() {
+        print("do some A stuff")
+    }
+}
+
+class StateB: State {
+    func doStuff() {
+        print("do some B stuff")
+    }
+}
+
+class Context {
+    var state: State = StateA()
+    func operation() {
+        state.doStuff()
+    }
+}
+
+let ctx = Context()
+
+ctx.operation()
+
+ctx.state = StateB()
+
+ctx.operation()
+```
+
+优点：
+
+- 只需改变状态就可以改变类的行为
+- 允许状态转换对象与状态对象合为一体
+- 多个对象可以共享状态
+
+缺点：
+
+- 违背开闭原则
+- 使用不当会使得代码结构混乱
+
+### 备忘录模式
+
+描述：在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。
+
+```swift
+class Todo: Codable{
+    
+    var content = ""
+}
+
+class Memento {
+    func save(todo: Todo, key: String) {
+        do {
+            let data = try JSONEncoder().encode(todo)
+            print(data)
+            UserDefaults.standard.set(data, forKey: key)
+            UserDefaults.standard.synchronize()
+        } catch {
+            print(error)
+        }
+    }
+    
+    func load(key: String) -> Todo? {
+        
+        guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+        
+        do {
+            
+            let todo = try JSONDecoder().decode(Todo.self, from: data)
+            return todo
+        } catch  {
+            print(error)
+        }
+        return nil
+    }
+}
+
+let todo = Todo()
+let memento = Memento()
+
+todo.content = "a simple thing"
+memento.save(todo: todo, key: "key")
+
+if let todo1 = memento.load(key: "key") {
+    print("\(todo) -- \(todo1)")
+}
+```
+
+备忘录模式可以通俗的理解为游戏的存档和读档。
+
+优点：
+
+- 提供给了用户可以保存状态的机制
+
+缺点：
+
+- 创建备忘会消耗资源
+
+### 策略模式
+
+描述：策略模式属于对象的行为模式，将某一组算法封装起来，让它们可以相互替换，策略模式提供了一种可插入式算法的实现方案
+
+```swift
+protocol Strategy {
+    func saveData()
+}
+
+class MemoryStrategy: Strategy {
+    func saveData() {
+        print("save data to memory")
+    }
+}
+
+class DiskStrategy: Strategy {
+    func saveData() {
+        print("save data to disk")
+    }
+}
+
+class Downloader {
+    let strategy: Strategy
+    init(strategy: Strategy) {
+        self.strategy = strategy
+    }
+    
+    func download() {
+        self.strategy.saveData()
+    }
+}
+
+Downloader(strategy: MemoryStrategy()).download()
+Downloader(strategy: DiskStrategy()).download()
+```
+
+如上，当我们调用下载方法时期望能够制定我们下载后的缓存策略
+
+优点：
+
+- 符合开闭原则，能够灵活的增加和修改实现
+- 提供了算法复用的实现
+
+缺点：
+
+- 需要自定义策略支持
+- 策略过多会在选择上花费一些功夫
 
 参考
 
