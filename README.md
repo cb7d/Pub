@@ -21,6 +21,7 @@
 - 架构模式
   - [MVVM](https://github.com/FelixScat/demo_MVVM)
 - 设计模式
+  - [设计模式Swift](./posts/design-pattern.md)
   - [KVO](https://github.com/FelixScat/demo_KVO)
 - HTTP
   - [HTTPS](./posts/HTTPS.md)
