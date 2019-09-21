@@ -17,6 +17,7 @@
   - [weakProxy](https://github.com/FelixScat/demo_TImer)
 - 内存管理
   - [Copy](https://github.com/FelixScat/demo_Copy)
+  - [Weak](./posts/weak.md)
 - 国际化
   - [International](./posts/international.md)
 - 架构模式
