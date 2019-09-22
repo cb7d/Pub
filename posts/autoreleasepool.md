@@ -1,6 +1,6 @@
 # Autoreleasepool
 
-我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢，和runloop又有什么关系呢
+我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
 
 ```objectivec
 int main(int argc, char * argv[]) {
