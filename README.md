@@ -30,6 +30,7 @@
 - HTTP
   - [HTTPS](./posts/HTTPS.md)
 - 运行时
+  - [Class](./posts/class.md)
   - [Runtime](https://github.com/FelixScat/demo_Runtime)
 - 编译器
   - [Clang](https://github.com/FelixScat/ClangTest)
