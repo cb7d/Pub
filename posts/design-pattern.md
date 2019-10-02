@@ -1196,6 +1196,29 @@ Downloader(strategy: DiskStrategy()).download()
 - 需要自定义策略支持
 - 策略过多会在选择上花费一些功夫
 
+## iOS常见的设计模式实现
+
+### 单例模式
+
+- UIApplication `sharedApplication`
+- NSBundle `mainBundle`
+- NSFileManager `defaultManager`
+- NSNotificationCenter `defaultCenter`
+- NSUserDefaults `standardUserDefaults`
+
+### 代理模式
+
+- UITableView
+- UITextView
+- UICollectionView
+- UIScrollView
+- UIGestureRecognizer
+
+### 观察者模式
+
+- Notification
+- KVO
+
 参考
 
 https://juejin.im/post/5b827f0df265da43412875dd#heading-11
