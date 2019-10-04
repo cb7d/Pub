@@ -17,6 +17,7 @@
 - 小技巧
   - [KVC](https://github.com/FelixScat/demo_KVC)
   - [weakProxy](https://github.com/FelixScat/demo_TImer)
+  - [Refactor](./posts/refactor.md)
 - 内存管理
   - [Copy](https://github.com/FelixScat/demo_Copy)
   - [Weak](./posts/weak.md)
