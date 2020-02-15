@@ -1,6 +1,9 @@
 {
     "author": "Felix <cb7d23@gmail.com>",
     "description": "A book of Felix",
+    "title": "A book of Felix",
+    "generator": "site",
+    "language": "zh-hans",
     "links": {
         "sharing": {
             "all": null,
@@ -13,5 +16,27 @@
             "Felix's Blog": "https://book.felixplus.top/"
         }
     },
-    "title": "A book of Felix"
+    "plugins": [
+        "back-to-top-button",
+        "github",
+        "lightbox",
+        "hide-element",
+        "-lunr", "-search", "search-pro",
+        "code",
+        "splitter",
+        "pageview-count"
+    ],
+    "pluginsConfig": {
+        "theme-default": {
+            "showLevel": false
+        },
+        "github": {
+            "url": "https://github.com/cb7d"
+        },
+        "hide-element": {
+            "elements": [
+                ".gitbook-link"
+            ]
+        }
+    }
 }
