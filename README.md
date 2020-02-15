@@ -1,45 +1,50 @@
-# K
+# [Cb7d](https://k.felixplus.top/)
 
-Felix的知识小集笔记
+> 欢迎来到 Felix匀昊 的博客，在下的小地方蓬荜生辉 ^_^
 
-- 多线程
-  - [GCD](https://github.com/FelixScat/demo_GCD)
-  - [RunLoop](https://github.com/FelixScat/demo_Runloop)
-  - [atomic](./posts/atomic.md)
-  - [autoreleasepool](./posts/autoreleasepool.md)
-  - [Lock](./posts/lock.md)
-- 包管理
-  - [Cocoapods](https://github.com/FelixScat/demo_cocoapods)
-- 缓存
-  - [NSCache](https://github.com/FelixScat/demo_NSCache)
-- 区块链
-  - [BlockChain](https://github.com/FelixScat/blockChainServer)
-- 小技巧
-  - [KVC](https://github.com/FelixScat/demo_KVC)
-  - [weakProxy](https://github.com/FelixScat/demo_TImer)
-  - [Refactor](./posts/refactor.md)
-- 内存管理
-  - [Copy](https://github.com/FelixScat/demo_Copy)
-  - [Weak](./posts/weak.md)
-- 国际化
-  - [International](./posts/international.md)
-- 架构模式
-  - [MVVM](https://github.com/FelixScat/demo_MVVM)
-- 设计模式
-  - [设计模式Swift](./posts/design-pattern.md)
-  - [KVO](https://github.com/FelixScat/demo_KVO)
-- 网路
-  - [HTTPS](./posts/HTTPS.md)
-  - [Optimization](./posts/network-layer-optimization.md)
-- 运行时
-  - [Class](./posts/class.md)
-  - [Runtime](https://github.com/FelixScat/demo_Runtime)
-- 编译器
-  - [Clang](https://github.com/FelixScat/ClangTest)
-- 源码阅读
-  - [AFNetworking](https://github.com/FelixScat/demo_AFN)
-  - [Aspects](https://github.com/FelixScat/demo_Aspects)
-  - [SDWebImage](https://github.com/FelixScat/demo_SDWebImage)
-- 志趣杂谈
-  - [darknet](./posts/darknet.md)
+![](https://min.felixplus.top/public/blog/wp-city-sea.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200215%2F%2Fs3%2Faws4_request&X-Amz-Date=20200215T125622Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=1d36128911e1bc1bf1cd27e8adac5bb1d682fb5f87e8579f0294de7a093b573b)
+
+---
+
+## WHY
+
+有的朋友会问为什么你有自己的博客，还要搞这么个网站出来呢
+
+这里我想说，很多知识不是你认为学会了就可以，单单写下来也是不够的
+
+我想在这里把自己学到的一点皮毛慢慢积累下来
+
+### 织网
+
+在博客上写的一些东西写完之后可能很久都不会去看，放在这里可以帮助我把这些织成一张网，让每个知识点都能融会贯通，也更有逻辑性
+
+## WHAT
+
+那么这里的内容都有什么呢
+
+1. 首先，我是一个朴素平平无奇的iOS开发工程师，所以这里会有很多内容关于开发中的一些小技巧和代码分析分享等
+
+2. 其次，我热爱技术，喜欢调查体验前沿的技术方案，所以会有一部分是对包括区块链，暗网等分析和体验，对运维和服务端部署方面也略有涉猎
+
+3. 在技术方面，iOS开发会经常使用 Swift 和 Objective-C ，除此之外我个人爱好比较宽泛，比如 nodejs、python3、SQL、ML，React、VUE、这些我都有一定程度的使用心得，但是毕竟这些不是我的主要研究方向，所以正在阅读我写的小作文的朋友请不要过分相信，如有错误还请不吝赐教（联系方式在最下面）
+
+除此之外关于算法和数据结构等我会尽量使用C/C++来coding，毕竟相对来说更底层一些（逃） 0_0
+
+## HOW
+
+由于最近工作繁忙，也需要平衡生活跟工作，所以更新频率不会太快，我尽量做到一周2-3更，除了关于技术的交流也考虑写一些小故事，有自己的也有身边人的，我会把不同的类别在目录中标明
+
+## ABOUT
+
+最后关于我自己，我是匀昊，开发届的小学生，目前在快手-杭州工作
+
+欢迎邮箱联系：cb7d23@gmail.com
+
+
+
+
+
+
+
+
 

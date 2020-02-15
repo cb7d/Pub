@@ -1,5 +1,3 @@
-# Summary
-
 * [Introduction](README.md)
 
 - 多线程

@@ -1,1 +1,17 @@
-{}
+{
+    "author": "Felix <cb7d23@gmail.com>",
+    "description": "A book of Felix",
+    "links": {
+        "sharing": {
+            "all": null,
+            "facebook": null,
+            "google": null,
+            "twitter": null,
+            "weibo": null
+        },
+        "sidebar": {
+            "Felix's Blog": "https://book.felixplus.top/"
+        }
+    },
+    "title": "A book of Felix"
+}
