@@ -23,8 +23,7 @@
         "hide-element",
         "-lunr", "-search", "search-pro",
         "code",
-        "splitter",
-        "pageview-count"
+        "splitter"
     ],
     "pluginsConfig": {
         "theme-default": {
