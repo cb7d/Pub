@@ -1,6 +1,11 @@
 # summary
 
 * [序言](README.md)
+
+
+* [算法](posts/algorithm/README.md)
+
+
 * [多线程](posts/thread/README.md)
   * [GCD-ObjC](posts/thread/gcd_objc.md)
   * [GCD-Swift](posts/thread/gcd_swift.md)
@@ -8,7 +13,6 @@
   * [atomic](posts/thread/atomic.md)
   * [autoreleasepool](posts/thread/autoreleasepool.md)
   * [Lock](posts/thread/lock.md)
-
 
 
 * [包管理]()
