@@ -1,0 +1,9 @@
+[submodule "k/themes/ananke"]
+	path = k/themes/ananke
+	url = https://github.com/budparr/gohugo-theme-ananke.git
+[submodule "k/themes/casper"]
+	path = k/themes/casper
+	url = git@github.com:cb7d/hugo-theme-casper.git
+[submodule "k/themes/sam"]
+	path = k/themes/sam
+	url = https://github.com/victoriadrake/hugo-theme-sam.git
