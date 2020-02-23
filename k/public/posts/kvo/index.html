@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="A new Hugo site.">
+<title>
+KVO 键值监听 - Cb7d
+</title>
+
+
+
+
+<link rel="shortcut icon" href="https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&amp;X-Amz-Date=20200223T024742Z&amp;X-Amz-Expires=432000&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://example.org/css/main.min.81bbafc4df93b11c1c3e2449464373c384aa4903731b4fc7a77dfcdd979e184f.css" integrity="sha256-gbuvxN&#43;TsRwcPiRJRkNzw4SqSQNzG0/Hp3383ZeeGE8=" crossorigin="anonymous" media="screen">
+
+
+
+ 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/tn.png"/>
+
+<meta name="twitter:title" content="KVO 键值监听"/>
+<meta name="twitter:description" content="Key-Value Observing 键值观察，是设计模式中观察者模式的实现
+ 键值观察提供了一种机制，允许对象通知其他对象的特定属性的更改。它对应用程序中模型和控制器层之间的通信特别有用。（在OS X中，控制器层绑定技术严重依赖于键值观察。）控制器对象通常观察模型对象的属性，视图对象通过控制器观察模型对象的属性。然而，另外，模型对象可以观察其他模型对象（通常用于确定从属值何时改变）或甚至自身（再次确定从属值何时改变）。
+ 使用KVO Xcode -&gt; New -&gt; MacOS -&gt; CommandLine 新建工程，创建Person类
+Person.h
+#import &lt;Foundation/Foundation.h&gt;  NS_ASSUME_NONNULL_BEGIN @interface Person : NSObject @property (nonatomic ,copy) NSString *name; @property (nonatomic ,assign) NSUInteger age; @property (nonatomic ,copy) NSArray&lt;Person *&gt; *friends; @end NS_ASSUME_NONNULL_END Person.m
+#import &#34;Person.h&#34;  @implementation Person - (instancetype)init { self = [super init]; if (self) { _name = @&#34;&#34;; _age = 0; _friends = @[]; } return self; } - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&lt;NSKeyValueChangeKey,id&gt; *)change context:(void *)context { // 当收到通知的时候打印观察的对象，旧值和新值  NSLog(@&#34;\nReceving ObserveValueChanged \nObject: %@ OldValue: %@, NewValue: %@&#34;,object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]); } // 重写以便打印对象的属性 - (NSString *)description { return [NSString stringWithFormat:@&#34;- name: %@, age: %ld, friends: %@&#34;,self."/>
+
+<meta property="og:title" content="KVO 键值监听" />
+<meta property="og:description" content="Key-Value Observing 键值观察，是设计模式中观察者模式的实现
+ 键值观察提供了一种机制，允许对象通知其他对象的特定属性的更改。它对应用程序中模型和控制器层之间的通信特别有用。（在OS X中，控制器层绑定技术严重依赖于键值观察。）控制器对象通常观察模型对象的属性，视图对象通过控制器观察模型对象的属性。然而，另外，模型对象可以观察其他模型对象（通常用于确定从属值何时改变）或甚至自身（再次确定从属值何时改变）。
+ 使用KVO Xcode -&gt; New -&gt; MacOS -&gt; CommandLine 新建工程，创建Person类
+Person.h
+#import &lt;Foundation/Foundation.h&gt;  NS_ASSUME_NONNULL_BEGIN @interface Person : NSObject @property (nonatomic ,copy) NSString *name; @property (nonatomic ,assign) NSUInteger age; @property (nonatomic ,copy) NSArray&lt;Person *&gt; *friends; @end NS_ASSUME_NONNULL_END Person.m
+#import &#34;Person.h&#34;  @implementation Person - (instancetype)init { self = [super init]; if (self) { _name = @&#34;&#34;; _age = 0; _friends = @[]; } return self; } - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&lt;NSKeyValueChangeKey,id&gt; *)change context:(void *)context { // 当收到通知的时候打印观察的对象，旧值和新值  NSLog(@&#34;\nReceving ObserveValueChanged \nObject: %@ OldValue: %@, NewValue: %@&#34;,object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]); } // 重写以便打印对象的属性 - (NSString *)description { return [NSString stringWithFormat:@&#34;- name: %@, age: %ld, friends: %@&#34;,self." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/posts/kvo/" />
+<meta property="og:image" content="http://example.org/tn.png"/>
+<meta property="article:published_time" content="2020-02-19T10:46:42+08:00" />
+<meta property="article:modified_time" content="2020-02-19T10:46:42+08:00" /><meta property="og:site_name" content="Cb7d" />
+
+
+    
+
+    
+    
+    
+    <title>
+        
+        KVO 键值监听
+        
+    </title>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="section" id="title">KVO 键值监听</div>
+
+        
+<div class="section" id="content">
+    Wed Feb 19, 2020 &#183; 338 words
+    <div class="tag-container">
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blog/">
+                blog
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/ios/">
+                iOS
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/objc/">
+                ObjC
+            </a>
+        </span>
+        
+        
+    </div>
+    <hr/>
+    <h1 id="key-value-observing">Key-Value Observing</h1>
+<p>键值观察，是设计模式中观察者模式的实现</p>
+<blockquote>
+<p>键值观察提供了一种机制，允许对象通知其他对象的特定属性的更改。它对应用程序中模型和控制器层之间的通信特别有用。（在OS X中，控制器层绑定技术严重依赖于键值观察。）控制器对象通常观察模型对象的属性，视图对象通过控制器观察模型对象的属性。然而，另外，模型对象可以观察其他模型对象（通常用于确定从属值何时改变）或甚至自身（再次确定从属值何时改变）。</p>
+</blockquote>
+<h2 id="使用kvo">使用KVO</h2>
+<p>Xcode -&gt; New -&gt; MacOS -&gt; CommandLine 新建工程，创建Person类</p>
+<p>Person.h</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &lt;Foundation/Foundation.h&gt;
+</span><span style="color:#75715e"></span>
+NS_ASSUME_NONNULL_BEGIN
+
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">Person</span> : <span style="color:#a6e22e">NSObject</span>
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span> ,<span style="color:#66d9ef">copy</span>) NSString <span style="color:#f92672">*</span>name;
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span> ,<span style="color:#66d9ef">assign</span>) NSUInteger age;
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span> ,<span style="color:#66d9ef">copy</span>) NSArray<span style="color:#f92672">&lt;</span>Person <span style="color:#f92672">*&gt;</span> <span style="color:#f92672">*</span>friends;
+
+<span style="color:#66d9ef">@end</span>
+
+NS_ASSUME_NONNULL_END
+</code></pre></div><p>Person.m</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &#34;Person.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">Person</span>
+
+- (<span style="color:#66d9ef">instancetype</span>)<span style="color:#a6e22e">init</span> {
+    
+    self <span style="color:#f92672">=</span> [super init];
+    
+    <span style="color:#66d9ef">if</span> (self) {
+        _name <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;&#34;</span>;
+        _age <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        _friends <span style="color:#f92672">=</span> <span style="color:#ae81ff">@[]</span>;
+    }
+    
+    <span style="color:#66d9ef">return</span> self;
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">observeValueForKeyPath:</span>(NSString <span style="color:#f92672">*</span>)keyPath <span style="color:#a6e22e">ofObject:</span>(<span style="color:#66d9ef">id</span>)object <span style="color:#a6e22e">change:</span>(NSDictionary<span style="color:#f92672">&lt;</span>NSKeyValueChangeKey,<span style="color:#66d9ef">id</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">*</span>)change <span style="color:#a6e22e">context:</span>(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>)context {
+    
+    <span style="color:#75715e">// 当收到通知的时候打印观察的对象，旧值和新值
+</span><span style="color:#75715e"></span>    NSLog(<span style="color:#e6db74">@&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Receving ObserveValueChanged </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Object: %@ OldValue: %@, NewValue: %@&#34;</span>,object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]);
+}
+
+<span style="color:#75715e">// 重写以便打印对象的属性
+</span><span style="color:#75715e"></span>- (NSString <span style="color:#f92672">*</span>)<span style="color:#a6e22e">description</span> {
+    
+    <span style="color:#66d9ef">return</span> [NSString stringWithFormat:<span style="color:#e6db74">@&#34;- name: %@, age: %ld, friends: %@&#34;</span>,self.name, self.age, self.friends];
+}
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>打开main.m，创建Alice和Bob，设置Bob观察Alice的age属性</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &lt;Foundation/Foundation.h&gt;
+</span><span style="color:#75715e">#import &#34;Person.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>PersonChangeContext <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>PersonChangeContext;
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#66d9ef">@autoreleasepool</span> {
+        <span style="color:#75715e">// insert code here...
+</span><span style="color:#75715e"></span>        
+        Person <span style="color:#f92672">*</span>Alice <span style="color:#f92672">=</span> Person.new;
+        Alice.name <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;Alice&#34;</span>;
+        Alice.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">18</span>;
+        
+        Person <span style="color:#f92672">*</span>Bob <span style="color:#f92672">=</span> Person.new;
+        Bob.name <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;Bob&#34;</span>;
+        Bob.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">28</span>;
+        
+        
+        [Alice addObserver:Bob forKeyPath:<span style="color:#e6db74">@&#34;age&#34;</span> options:NSKeyValueObservingOptionOld<span style="color:#f92672">|</span>NSKeyValueObservingOptionNew context:PersonChangeContext];
+        
+        Alice.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;
+        
+        [Alice removeObserver:Bob forKeyPath:<span style="color:#e6db74">@&#34;age&#34;</span>];
+        
+        Alice.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>;
+        
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>可以看到控制台输出了一次Alice的age属性的前后变化.</p>
+<p>其中，NSKeyValueObservingOptions 有以下几个选项，可以使用 | 符号组合使用</p>
+<ul>
+<li>NSKeyValueObservingOptionNew // 收到通知时change字典将包含新值</li>
+<li>NSKeyValueObservingOptionOld // 收到通知时change字典将包含旧值</li>
+<li>NSKeyValueObservingOptionInitial // 在addObserver时会发送通知，change字典将包含初始值</li>
+<li>NSKeyValueObservingOptionPrior // 在所观察keyPath改变之前将收到通知</li>
+</ul>
+<p>change字典的key值在这里</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">FOUNDATION_EXPORT NSKeyValueChangeKey <span style="color:#66d9ef">const</span> NSKeyValueChangeKindKey;
+FOUNDATION_EXPORT NSKeyValueChangeKey <span style="color:#66d9ef">const</span> NSKeyValueChangeNewKey;
+FOUNDATION_EXPORT NSKeyValueChangeKey <span style="color:#66d9ef">const</span> NSKeyValueChangeOldKey;
+FOUNDATION_EXPORT NSKeyValueChangeKey <span style="color:#66d9ef">const</span> NSKeyValueChangeIndexesKey;
+FOUNDATION_EXPORT NSKeyValueChangeKey <span style="color:#66d9ef">const</span> NSKeyValueChangeNotificationIsPriorKey 
+</code></pre></div><p>KVO的使用场景有很多，比如Person拥有一个account属性，person需要获取account的变化该如何处理呢，轮训或许是个办法，但是无疑效率低下，而且很不安全，更合理的办法就是使用KVO观察account，在account发生变化时更新。</p>
+<h2 id="原理">原理</h2>
+<p>现在我们已经知其然了，但是还不知其所以然。</p>
+<h3 id="先说结论">先说结论</h3>
+<ol>
+<li>系统通过runtime生成继承与被观察者的新类(NSKVONotifying_Person)，对原对象进行isa-swizzing(isa混写)</li>
+<li>根据KVC(键值编码)对对象的keypath进行hock</li>
+<li>在将要对属性进行赋值操作时发送通知</li>
+</ol>
+<p>如何证明上述结论呢，上代码！</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &lt;Foundation/Foundation.h&gt;
+</span><span style="color:#75715e">#import &lt;objc/runtime.h&gt;
+</span><span style="color:#75715e">#import &#34;Person.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>PersonChangeContext <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>PersonChangeContext;
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#66d9ef">@autoreleasepool</span> {        
+        
+        Person <span style="color:#f92672">*</span>Alice <span style="color:#f92672">=</span> Person.new;
+        Alice.name <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;Alice&#34;</span>;
+        Alice.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">18</span>;
+        
+        Person <span style="color:#f92672">*</span>Bob <span style="color:#f92672">=</span> Person.new;
+        Bob.name <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;Bob&#34;</span>;
+        Bob.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">28</span>;
+        
+        
+        <span style="color:#66d9ef">Class</span> cls0 <span style="color:#f92672">=</span> object_getClass(Alice);
+        
+        [Alice addObserver:Bob forKeyPath:<span style="color:#e6db74">@&#34;age&#34;</span> options:NSKeyValueObservingOptionOld<span style="color:#f92672">|</span>NSKeyValueObservingOptionNew context:PersonChangeContext];
+        
+        Alice.age <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;
+        
+        <span style="color:#66d9ef">Class</span> cls1 <span style="color:#f92672">=</span> object_getClass(Alice);
+        
+        NSLog(<span style="color:#e6db74">@&#34;%@ %@&#34;</span>,cls0,cls1);
+        
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><ol>
+<li>首先引入runtime，这样我们可以打印isa所指向的真实的类，</li>
+<li>在向Alice添加观察者之前，先获取Class</li>
+<li>在向Alice添加观察者之后，获取Class</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">Person NSKVONotifying_Person
+</code></pre></div><p>可以看到输出确实如此</p>
+<h3 id="如何禁止对象被观察">如何禁止对象被观察?</h3>
+<p>我们只要在Person类中重写这个方法，外部就无法对我们Person的属性进行监听啦</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objc" data-lang="objc">+ (<span style="color:#66d9ef">BOOL</span>)<span style="color:#a6e22e">automaticallyNotifiesObserversForKey:</span>(NSString <span style="color:#f92672">*</span>)key {
+    <span style="color:#66d9ef">return</span> false;
+}
+</code></pre></div><h3 id="如何单独禁止某个属性被观察">如何单独禁止某个属性被观察？</h3>
+<p>我们在Person里实现automaticallyNotifiesObserversOf + XXX（属性名），并返回为 false 就可以单独禁止自动为某个属性生成监听了</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">+ (<span style="color:#66d9ef">BOOL</span>)<span style="color:#a6e22e">automaticallyNotifiesObserversOfAge</span> {
+    <span style="color:#66d9ef">return</span> false;
+}
+</code></pre></div><h3 id="如何自定义kvo触发条件">如何自定义KVO触发条件？</h3>
+<p>有的时候我们只是需要在属性改变为某个状态的时候才需要作出响应，这个时候我们可以在上面方法的基础上自定义发送通知</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">setAge:</span>(NSUInteger)age {
+    <span style="color:#66d9ef">if</span> (age <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">33</span>) {
+        [self willChangeValueForKey:NSStringFromSelector(<span style="color:#66d9ef">@selector</span>(age))];
+    }
+    _age <span style="color:#f92672">=</span> age;
+    <span style="color:#66d9ef">if</span> (age <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">33</span>) {
+        [self didChangeValueForKey:NSStringFromSelector(<span style="color:#66d9ef">@selector</span>(age))];
+    }
+}
+</code></pre></div><p>比如在age的setter里面，判断condition，如果达成条件则调用 <code>willChangeValueForKey</code> 和 <code>didChangeValueForKey</code> 通知外部。</p>
+<p>这就是KVO的核心思路了，关于KVC请看<a href="https://k.felixplus.top/kvc/">这里</a>.</p>
+
+</div>
+
+
+        
+<div class="section bottom-menu">
+    
+<hr />
+<p>
+
+
+    
+        <a href="http://example.org/posts">back</a>
+        
+            &#183;
+        
+    
+
+    
+        
+            <a href="http://example.org/posts">posts</a>
+        
+    
+    
+        
+            &#183; 
+            <a href="http://example.org/memoryManage">memoryManage</a>
+        
+            &#183; 
+            <a href="http://example.org/portfolio">portfolio</a>
+        
+            &#183; 
+            <a href="http://example.org/about">who is Cb7d?</a>
+        
+    
+    &#183; 
+    <a href="http://example.org/">
+        main
+    </a>
+
+</p>
+</div>
+
+
+        <div class="section footer">Cb7d &lsquo;s blog.</div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>memory on Cb7d</title>
+    <link>http://example.org/tags/memory/</link>
+    <description>Recent content in memory on Cb7d</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>All rights reserved - 2020</copyright>
+    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://example.org/tags/memory/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>浅谈 ObjC 中的几种copy</title>
+      <link>http://example.org/posts/copy/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/copy/</guid>
+      <description>Copy 拷贝是我们在开发中经常使用的技巧，这里指的不是到Github上去复制粘贴代码，而是对内存中对象的操作 (逃
+ 深拷贝与浅拷贝的区别 ？ 深拷贝是指我们拷贝出来的对象拥有自己单独的内存地址，修改新对象不影响源对象，浅拷贝指的是在copy指针的引用，修改新对象会影响到源对象
+ 在ObjC里面主要有两个方法对对象进行拷贝
+- (id)copy; - (id)mutableCopy; 要对象能够使用这两个方法需要遵守协议 NSCopying, NSMutableCopying
+那么，该何时使用这两种方法呢， 先说结论，只有不可变对象调用copy方法的时候才是浅拷贝，其他情况均为深拷贝 新建一个工程验证一下吧
+Xcode -&amp;gt; New -&amp;gt; MacOS -&amp;gt; CommandLine -&amp;gt; main.m
+由于NSString 同时实现了 NSCopying, NSMutableCopying 两个协议，我们就用他来做实验
+NSString *str1 = @&amp;#34;str1&amp;#34;; NSString *str2 = str1.copy; NSString *str3 = str1.mutableCopy; NSLog(@&amp;#34;%p %p %p&amp;#34;,str1, str2, str3); 运行之后可以看到如下输出
+0x1000020b8 0x1000020b8 0x100508e00 由此可以得出结论，不可变对象使用 mutableCopy 为深拷贝 ，copy 为浅拷贝
+下面验证一下可变对象 NSMutableString
+NSMutableString *str1 = [NSMutableString stringWithFormat:@&amp;#34;str1&amp;#34;]; NSString *str2 = str1.copy; NSString *str3 = str1.</description>
+    </item>
+    
+  </channel>
+</rss>

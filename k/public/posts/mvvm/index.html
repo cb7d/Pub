@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="A new Hugo site.">
+<title>
+MVVM - Cb7d
+</title>
+
+
+
+
+<link rel="shortcut icon" href="https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&amp;X-Amz-Date=20200223T024742Z&amp;X-Amz-Expires=432000&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://example.org/css/main.min.81bbafc4df93b11c1c3e2449464373c384aa4903731b4fc7a77dfcdd979e184f.css" integrity="sha256-gbuvxN&#43;TsRwcPiRJRkNzw4SqSQNzG0/Hp3383ZeeGE8=" crossorigin="anonymous" media="screen">
+
+
+
+ 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/tn.png"/>
+
+<meta name="twitter:title" content="MVVM"/>
+<meta name="twitter:description" content="M-V-VM  目前客户端最流行的架构应该就是MVVM，然而在看了一些文章之后发现大部分是理论而并没有仔细讲解具体的架构方法和实践，这篇博客说说我在实际工作中的使用。
+ 引言 提到MVVM我们不得不先来认识一下MVC： MVC模式（Model–view–controller）是软件工程中的一种软件架构模式，把软件系统分为三个基本部分：模型（Model）、视图（View）和控制器（Controller）。MVC模式最早由Trygve Reenskaug在1978年提出[1]，是施乐帕罗奥多研究中心（Xerox PARC）在20世纪80年代为程序语言Smalltalk发明的一种软件架构。MVC模式的目的是实现一种动态的程序设计，使后续对程序的修改和扩展简化，并且使程序某一部分的重复利用成为可能。除此之外，此模式通过对复杂度的简化，使程序结构更加直观。软件系统通过对自身基本部分分离的同时也赋予了各个基本部分应有的功能。专业人员可以通过自身的专长分组：
+ 控制器（Controller）- 负责转发请求，对请求进行处理。 视图（View） - 界面设计人员进行图形界面设计。 模型（Model） - 程序员编写程序应有的功能（实现算法等等）、数据库专家进行数据管理和数据库设计(可以实现具体的功能)。  MVVM  MVVM是Model-View-ViewModel的简写，最早是由微软公司提出并运用，是MVP（Model-View-Presenter）模式与WPF结合的应用方式时发展演变过来的一种新型架构架构。MVVM有助于将图形用户界面的开发与业务逻辑或后端逻辑（数据模型）的开发分离开来，这是通过置标语言或GUI代码实现的。MVVM的视图模型是一个值转换器，这意味着视图模型负责从模型中暴露（转换）数据对象，以便轻松管理和呈现对象。在这方面，视图模型比视图做得更多，并且处理大部分视图的显示逻辑。视图模型可以实现中介者模式，组织对视图所支持的用例集的后端逻辑的访问。
+  模型 模型是指代表真实状态内容的领域模型（面向对象），或指代表内容的数据访问层（以数据为中心）。 视图 就像在MVC和MVP模式中一样，视图是用户在屏幕上看到的结构、布局和外观（UI）。 视图模型 视图模型是暴露公共属性和命令的视图的抽象。MVVM没有MVC模式的控制器，也没有MVP模式的presenter，有的是一个绑定器。在视图模型中，绑定器在视图和数据绑定器之间进行通信。 绑定器 声明性数据和命令绑定隐含在MVVM模式中。在Microsoft解决方案堆中，绑定器是一种名为XAML的标记语言。绑定器使开发人员免于被迫编写样板式逻辑来同步视图模型和视图。在微软的堆之外实现时，声明性数据绑定技术的出现是实现该模式的一个关键因素。  MVVM 的优点 解决controller过于臃肿 在MVC中很容易就会把一些业务逻辑，网络请求，数据IO都放在controller中
+注意,这里不是说MVC的控制器一定很臃肿，而是「容易变得臃肿」
+在我们新建一个工程的时候,苹果会自动帮我们生成一个ViewController,而在动手开始写代码的时候,往往控制不住就直接将逻辑写在Controller中。
+MVVM架构会要求我们把任何与非View的逻辑玻璃出来,Controller中除了绑定viewModel之外的代码只允许出现对View的操作。因为Controller对我们来说也只是一个View。
+逻辑分离， 易于测试 就像上面说的,业务逻辑都会抽离出来放在viewModel中 ，这样可以在任何地方重用这一堆业务
+除此之外,我们的代码将会更加易于测试,避免出现在MVC中可能出现的那种超长的方法、严重依赖全局状态导致难以测试的问题。
+View重用 在MVVM中,View只需要与ViewMode交互,不会收到其他的影响,所以不但vm、m 可以重用,view一样可以重复使用,修改的时候也更加方便。
+缺点 BUG与传递 由于在MVVM里面View和ViewModel是松耦合的,在测试出问题的时候就要排查各个地方的问题,
+有可能是vm中的也有可能是view中的。由于vm会传递数据,一个bug会很容易的传递到其他地方,引发更大的问题。
+并且其中一个地方出现问题的话,这个BUG就极有可能随着传递到其他的逻辑中,从而导致更严重的问题发生。
+需要维护额外的开销。 额外的viewModel使用也并不是无代价的,有可能由于各种原因导致管理起来稍微复杂。而额外的,如果因为强引用或其他原因导致的循环引用等内存不能正确释放的情况下,有可能会内存疯涨，所以需要确保你的使用方式是无副作用的。
+使用方法 上面说了这些只是一个大致的介绍,我们还是来看看应该怎样使用吧。
+你可以使用delegate的方式或者block的方式对view和viewModel进行桥接,在这里我们选择使用delegate,我认为这样看着比较直观,在代码中也更加明确。
+首先创建一个工程,选择singleViewApplication,我们就以最常见的的登陆功能作为示例
+新建用于由viewModel调用,view进行响应的protocol 首先要起个名字,就叫LoginViewModelDelegateProtocol 吧
+@protocol LoginViewModelDelegateProtocol &lt;NSObject&gt; @end 好,让我们想一想view会发送一些什么数据给VM ，VM都需要什么数据。
+对于简单登陆的VM来说,我们需要通知view的数据和方法
+ 登陆成功 错误提示 按钮状态改变（是否可以点击）  那么我们可以在protocol中添加方法了"/>
+
+<meta property="og:title" content="MVVM" />
+<meta property="og:description" content="M-V-VM  目前客户端最流行的架构应该就是MVVM，然而在看了一些文章之后发现大部分是理论而并没有仔细讲解具体的架构方法和实践，这篇博客说说我在实际工作中的使用。
+ 引言 提到MVVM我们不得不先来认识一下MVC： MVC模式（Model–view–controller）是软件工程中的一种软件架构模式，把软件系统分为三个基本部分：模型（Model）、视图（View）和控制器（Controller）。MVC模式最早由Trygve Reenskaug在1978年提出[1]，是施乐帕罗奥多研究中心（Xerox PARC）在20世纪80年代为程序语言Smalltalk发明的一种软件架构。MVC模式的目的是实现一种动态的程序设计，使后续对程序的修改和扩展简化，并且使程序某一部分的重复利用成为可能。除此之外，此模式通过对复杂度的简化，使程序结构更加直观。软件系统通过对自身基本部分分离的同时也赋予了各个基本部分应有的功能。专业人员可以通过自身的专长分组：
+ 控制器（Controller）- 负责转发请求，对请求进行处理。 视图（View） - 界面设计人员进行图形界面设计。 模型（Model） - 程序员编写程序应有的功能（实现算法等等）、数据库专家进行数据管理和数据库设计(可以实现具体的功能)。  MVVM  MVVM是Model-View-ViewModel的简写，最早是由微软公司提出并运用，是MVP（Model-View-Presenter）模式与WPF结合的应用方式时发展演变过来的一种新型架构架构。MVVM有助于将图形用户界面的开发与业务逻辑或后端逻辑（数据模型）的开发分离开来，这是通过置标语言或GUI代码实现的。MVVM的视图模型是一个值转换器，这意味着视图模型负责从模型中暴露（转换）数据对象，以便轻松管理和呈现对象。在这方面，视图模型比视图做得更多，并且处理大部分视图的显示逻辑。视图模型可以实现中介者模式，组织对视图所支持的用例集的后端逻辑的访问。
+  模型 模型是指代表真实状态内容的领域模型（面向对象），或指代表内容的数据访问层（以数据为中心）。 视图 就像在MVC和MVP模式中一样，视图是用户在屏幕上看到的结构、布局和外观（UI）。 视图模型 视图模型是暴露公共属性和命令的视图的抽象。MVVM没有MVC模式的控制器，也没有MVP模式的presenter，有的是一个绑定器。在视图模型中，绑定器在视图和数据绑定器之间进行通信。 绑定器 声明性数据和命令绑定隐含在MVVM模式中。在Microsoft解决方案堆中，绑定器是一种名为XAML的标记语言。绑定器使开发人员免于被迫编写样板式逻辑来同步视图模型和视图。在微软的堆之外实现时，声明性数据绑定技术的出现是实现该模式的一个关键因素。  MVVM 的优点 解决controller过于臃肿 在MVC中很容易就会把一些业务逻辑，网络请求，数据IO都放在controller中
+注意,这里不是说MVC的控制器一定很臃肿，而是「容易变得臃肿」
+在我们新建一个工程的时候,苹果会自动帮我们生成一个ViewController,而在动手开始写代码的时候,往往控制不住就直接将逻辑写在Controller中。
+MVVM架构会要求我们把任何与非View的逻辑玻璃出来,Controller中除了绑定viewModel之外的代码只允许出现对View的操作。因为Controller对我们来说也只是一个View。
+逻辑分离， 易于测试 就像上面说的,业务逻辑都会抽离出来放在viewModel中 ，这样可以在任何地方重用这一堆业务
+除此之外,我们的代码将会更加易于测试,避免出现在MVC中可能出现的那种超长的方法、严重依赖全局状态导致难以测试的问题。
+View重用 在MVVM中,View只需要与ViewMode交互,不会收到其他的影响,所以不但vm、m 可以重用,view一样可以重复使用,修改的时候也更加方便。
+缺点 BUG与传递 由于在MVVM里面View和ViewModel是松耦合的,在测试出问题的时候就要排查各个地方的问题,
+有可能是vm中的也有可能是view中的。由于vm会传递数据,一个bug会很容易的传递到其他地方,引发更大的问题。
+并且其中一个地方出现问题的话,这个BUG就极有可能随着传递到其他的逻辑中,从而导致更严重的问题发生。
+需要维护额外的开销。 额外的viewModel使用也并不是无代价的,有可能由于各种原因导致管理起来稍微复杂。而额外的,如果因为强引用或其他原因导致的循环引用等内存不能正确释放的情况下,有可能会内存疯涨，所以需要确保你的使用方式是无副作用的。
+使用方法 上面说了这些只是一个大致的介绍,我们还是来看看应该怎样使用吧。
+你可以使用delegate的方式或者block的方式对view和viewModel进行桥接,在这里我们选择使用delegate,我认为这样看着比较直观,在代码中也更加明确。
+首先创建一个工程,选择singleViewApplication,我们就以最常见的的登陆功能作为示例
+新建用于由viewModel调用,view进行响应的protocol 首先要起个名字,就叫LoginViewModelDelegateProtocol 吧
+@protocol LoginViewModelDelegateProtocol &lt;NSObject&gt; @end 好,让我们想一想view会发送一些什么数据给VM ，VM都需要什么数据。
+对于简单登陆的VM来说,我们需要通知view的数据和方法
+ 登陆成功 错误提示 按钮状态改变（是否可以点击）  那么我们可以在protocol中添加方法了" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/posts/mvvm/" />
+<meta property="og:image" content="http://example.org/tn.png"/>
+<meta property="article:published_time" content="2020-02-19T10:46:42+08:00" />
+<meta property="article:modified_time" content="2020-02-19T10:46:42+08:00" /><meta property="og:site_name" content="Cb7d" />
+
+
+    
+
+    
+    
+    
+    <title>
+        
+        MVVM
+        
+    </title>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="section" id="title">MVVM</div>
+
+        
+<div class="section" id="content">
+    Wed Feb 19, 2020 &#183; 344 words
+    <div class="tag-container">
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blog/">
+                blog
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/ios/">
+                iOS
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/objc/">
+                ObjC
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/mvx/">
+                MVX
+            </a>
+        </span>
+        
+        
+    </div>
+    <hr/>
+    <h1 id="m-v-vm">M-V-VM</h1>
+<blockquote>
+<p>目前客户端最流行的架构应该就是MVVM，然而在看了一些文章之后发现大部分是理论而并没有仔细讲解具体的架构方法和实践，这篇博客说说我在实际工作中的使用。</p>
+</blockquote>
+<h2 id="引言">引言</h2>
+<p>提到MVVM我们不得不先来认识一下MVC：
+MVC模式（Model–view–controller）是软件工程中的一种软件架构模式，把软件系统分为三个基本部分：模型（Model）、视图（View）和控制器（Controller）。MVC模式最早由Trygve Reenskaug在1978年提出[1]，是施乐帕罗奥多研究中心（Xerox PARC）在20世纪80年代为程序语言Smalltalk发明的一种软件架构。MVC模式的目的是实现一种动态的程序设计，使后续对程序的修改和扩展简化，并且使程序某一部分的重复利用成为可能。除此之外，此模式通过对复杂度的简化，使程序结构更加直观。软件系统通过对自身基本部分分离的同时也赋予了各个基本部分应有的功能。专业人员可以通过自身的专长分组：</p>
+<ul>
+<li>控制器（Controller）- 负责转发请求，对请求进行处理。</li>
+<li>视图（View） - 界面设计人员进行图形界面设计。</li>
+<li>模型（Model） - 程序员编写程序应有的功能（实现算法等等）、数据库专家进行数据管理和数据库设计(可以实现具体的功能)。</li>
+</ul>
+<h3 id="mvvm">MVVM</h3>
+<blockquote>
+<p>MVVM是Model-View-ViewModel的简写，最早是由微软公司提出并运用，是MVP（Model-View-Presenter）模式与WPF结合的应用方式时发展演变过来的一种新型架构架构。MVVM有助于将图形用户界面的开发与业务逻辑或后端逻辑（数据模型）的开发分离开来，这是通过置标语言或GUI代码实现的。MVVM的视图模型是一个值转换器，这意味着视图模型负责从模型中暴露（转换）数据对象，以便轻松管理和呈现对象。在这方面，视图模型比视图做得更多，并且处理大部分视图的显示逻辑。视图模型可以实现中介者模式，组织对视图所支持的用例集的后端逻辑的访问。</p>
+</blockquote>
+<ul>
+<li>模型 模型是指代表真实状态内容的领域模型（面向对象），或指代表内容的数据访问层（以数据为中心）。</li>
+<li>视图 就像在MVC和MVP模式中一样，视图是用户在屏幕上看到的结构、布局和外观（UI）。</li>
+<li>视图模型 视图模型是暴露公共属性和命令的视图的抽象。MVVM没有MVC模式的控制器，也没有MVP模式的presenter，有的是一个绑定器。在视图模型中，绑定器在视图和数据绑定器之间进行通信。</li>
+<li>绑定器 声明性数据和命令绑定隐含在MVVM模式中。在Microsoft解决方案堆中，绑定器是一种名为XAML的标记语言。绑定器使开发人员免于被迫编写样板式逻辑来同步视图模型和视图。在微软的堆之外实现时，声明性数据绑定技术的出现是实现该模式的一个关键因素。</li>
+</ul>
+<h2 id="mvvm-的优点">MVVM 的优点</h2>
+<h3 id="解决controller过于臃肿">解决controller过于臃肿</h3>
+<p>在MVC中很容易就会把一些业务逻辑，网络请求，数据IO都放在controller中</p>
+<p>注意,这里不是说MVC的控制器一定很臃肿，而是「容易变得臃肿」</p>
+<p>在我们新建一个工程的时候,苹果会自动帮我们生成一个ViewController,而在动手开始写代码的时候,往往控制不住就直接将逻辑写在Controller中。</p>
+<p>MVVM架构会要求我们把任何与非View的逻辑玻璃出来,Controller中除了绑定viewModel之外的代码只允许出现对View的操作。因为Controller对我们来说也只是一个View。</p>
+<h3 id="逻辑分离-易于测试">逻辑分离， 易于测试</h3>
+<p>就像上面说的,业务逻辑都会抽离出来放在viewModel中 ，这样可以在任何地方重用这一堆业务</p>
+<p>除此之外,我们的代码将会更加易于测试,避免出现在MVC中可能出现的那种超长的方法、严重依赖全局状态导致难以测试的问题。</p>
+<h3 id="view重用">View重用</h3>
+<p>在MVVM中,View只需要与ViewMode交互,不会收到其他的影响,所以不但vm、m 可以重用,view一样可以重复使用,修改的时候也更加方便。</p>
+<h2 id="缺点">缺点</h2>
+<h3 id="bug与传递">BUG与传递</h3>
+<p>由于在MVVM里面View和ViewModel是松耦合的,在测试出问题的时候就要排查各个地方的问题,</p>
+<p>有可能是vm中的也有可能是view中的。由于vm会传递数据,一个bug会很容易的传递到其他地方,引发更大的问题。</p>
+<p>并且其中一个地方出现问题的话,这个BUG就极有可能随着传递到其他的逻辑中,从而导致更严重的问题发生。</p>
+<h3 id="需要维护额外的开销">需要维护额外的开销。</h3>
+<p>额外的viewModel使用也并不是无代价的,有可能由于各种原因导致管理起来稍微复杂。而额外的,如果因为强引用或其他原因导致的循环引用等内存不能正确释放的情况下,有可能会内存疯涨，所以需要确保你的使用方式是无副作用的。</p>
+<h2 id="使用方法">使用方法</h2>
+<p>上面说了这些只是一个大致的介绍,我们还是来看看应该怎样使用吧。</p>
+<p>你可以使用delegate的方式或者block的方式对view和viewModel进行桥接,在这里我们选择使用delegate,我认为这样看着比较直观,在代码中也更加明确。</p>
+<p>首先创建一个工程,选择singleViewApplication,我们就以最常见的的登陆功能作为示例</p>
+<h3 id="新建用于由viewmodel调用view进行响应的protocol">新建用于由viewModel调用,view进行响应的protocol</h3>
+<p>首先要起个名字,就叫LoginViewModelDelegateProtocol 吧</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">@protocol</span> <span style="color:#a6e22e">LoginViewModelDelegateProtocol</span> <span style="color:#f92672">&lt;</span>NSObject<span style="color:#f92672">&gt;</span>
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>好,让我们想一想view会发送一些什么数据给VM ，VM都需要什么数据。</p>
+<p>对于简单登陆的VM来说,我们需要通知view的数据和方法</p>
+<ul>
+<li>登陆成功</li>
+<li>错误提示</li>
+<li>按钮状态改变（是否可以点击）</li>
+</ul>
+<p>那么我们可以在protocol中添加方法了</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">@protocol</span> <span style="color:#a6e22e">LoginViewModelDelegate</span> <span style="color:#f92672">&lt;</span>NSObject<span style="color:#f92672">&gt;</span>
+
+<span style="color:#f92672">-</span> (<span style="color:#66d9ef">void</span>)loginSuccess;
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">showTips:</span>(NSString <span style="color:#f92672">*</span>)tip;
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">buttonEnable:</span>(<span style="color:#66d9ef">BOOL</span> )enable;
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><h3 id="新建用于由view调用viewmodel进行响应的protocol">新建用于由view调用,viewModel进行响应的protocol</h3>
+<p>同理,我们只要确认vm和v需要交换的数据就好了。</p>
+<ul>
+<li>用户名输入框的字符串</li>
+<li>密码输入框的字符串</li>
+<li>点击登陆事件</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">@protocol</span> <span style="color:#a6e22e">LoginViewModelInterface</span> <span style="color:#f92672">&lt;</span>NSObject<span style="color:#f92672">&gt;</span>
+
+<span style="color:#f92672">-</span> (<span style="color:#66d9ef">void</span>)inputUserName:(NSString <span style="color:#f92672">*</span>)uname;
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">inputPwd:</span>(NSString <span style="color:#f92672">*</span>)pwd;
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">didTapLoginBUtton</span>;
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><h3 id="实现代理方法">实现代理方法</h3>
+<p>下面我们新建一个viewModel叫做LoginViewModel</p>
+<p>LoginViewModel.h</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &lt;Foundation/Foundation.h&gt;
+</span><span style="color:#75715e">#import &#34;LoginViewModelDelegate.h&#34;
+</span><span style="color:#75715e">#import &#34;LoginViewModelInterface.h&#34;
+</span><span style="color:#75715e"></span>
+NS_ASSUME_NONNULL_BEGIN
+
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">LoginViewModel</span> : <span style="color:#a6e22e">NSObject</span> <span style="color:#f92672">&lt;</span>LoginViewModelInterface<span style="color:#f92672">&gt;</span>
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span>, <span style="color:#66d9ef">weak</span>) <span style="color:#66d9ef">id</span><span style="color:#f92672">&lt;</span>LoginViewModelDelegate<span style="color:#f92672">&gt;</span> delegate;
+
+<span style="color:#66d9ef">@end</span>
+
+NS_ASSUME_NONNULL_END
+</code></pre></div><p>LoginViewModel.m</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &#34;LoginViewModelDelegateProtocol.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">LoginViewModel</span> ()
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">assign</span>, <span style="color:#66d9ef">nonatomic</span>) <span style="color:#66d9ef">BOOL</span> unameValid;
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">assign</span>, <span style="color:#66d9ef">nonatomic</span>) <span style="color:#66d9ef">BOOL</span> pwdValid;
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">LoginViewModel</span>
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">inputUserName:</span>(NSString <span style="color:#f92672">*</span>)uname {
+    self.unameValid <span style="color:#f92672">=</span> uname.length<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0</span>;
+    [self judgeAllValid];
+}
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">inputPwd:</span>(NSString <span style="color:#f92672">*</span>)pwd {
+    self.pwdValid <span style="color:#f92672">=</span> pwd.length<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0</span>;
+    [self judgeAllValid];
+}
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">didTapLoginBUtton</span> {
+    <span style="color:#75715e">// 一些请求,这里忽略网络请求,直接模拟结果
+</span><span style="color:#75715e"></span>    [self.delegate loginSuccess];
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">judgeAllValid</span> {
+    <span style="color:#66d9ef">BOOL</span> v <span style="color:#f92672">=</span> [self isAllValid];
+    [self.delegate buttonEnable:v];
+}
+
+- (<span style="color:#66d9ef">BOOL</span>)<span style="color:#a6e22e">isAllValid</span> {
+    <span style="color:#66d9ef">return</span> self.unameValid <span style="color:#f92672">&amp;&amp;</span> self.pwdValid;
+}
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>然后在controller初始化,并且实现全部的方法就可以了。</p>
+<p>viewController.m</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &#34;ViewController.h&#34;
+</span><span style="color:#75715e">#import &#34;LoginViewModelDelegate.h&#34;
+</span><span style="color:#75715e">#import &#34;LoginViewModel.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">ViewController</span> () <span style="color:#f92672">&lt;</span>LoginViewModelDelegate, UITextFieldDelegate<span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span> ,<span style="color:#66d9ef">strong</span>) LoginViewModel <span style="color:#f92672">*</span>vm;
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">weak</span>, <span style="color:#66d9ef">nonatomic</span>) <span style="color:#66d9ef">IBOutlet</span> UITextField <span style="color:#f92672">*</span>unameTxf;
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">weak</span>, <span style="color:#66d9ef">nonatomic</span>) <span style="color:#66d9ef">IBOutlet</span> UITextField <span style="color:#f92672">*</span>pwdTxf;
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">weak</span>, <span style="color:#66d9ef">nonatomic</span>) <span style="color:#66d9ef">IBOutlet</span> UIButton <span style="color:#f92672">*</span>loginBtn;
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">ViewController</span>
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">viewDidLoad</span> {
+    
+    [super viewDidLoad];
+    self.vm.delegate <span style="color:#f92672">=</span> self;
+}
+
+- (<span style="color:#66d9ef">IBAction</span>)<span style="color:#a6e22e">toggleLogin:</span>(<span style="color:#66d9ef">id</span>)sender {
+    [self.vm didTapLoginBUtton];
+}
+
+<span style="color:#75715e">#pragma mark - UITextFieldDelegate
+</span><span style="color:#75715e"></span>
+- (<span style="color:#66d9ef">BOOL</span>)<span style="color:#a6e22e">textField:</span>(UITextField <span style="color:#f92672">*</span>)textField <span style="color:#a6e22e">shouldChangeCharactersInRange:</span>(NSRange)range <span style="color:#a6e22e">replacementString:</span>(NSString <span style="color:#f92672">*</span>)string {
+    
+    NSString <span style="color:#f92672">*</span>str <span style="color:#f92672">=</span> [textField.text stringByReplacingCharactersInRange:range withString:string];
+    
+    <span style="color:#66d9ef">switch</span> (textField.tag) {
+        <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span>
+            [self.vm inputUserName:str];
+            <span style="color:#66d9ef">break</span>;
+            
+        <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>
+            [self.vm inputPwd:str];
+            <span style="color:#66d9ef">break</span>;
+    }
+    <span style="color:#66d9ef">return</span> true;
+}
+
+<span style="color:#75715e">#pragma mark - VMDelegate
+</span><span style="color:#75715e"></span>
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">loginSuccess</span> {
+    
+    [self showTips:<span style="color:#e6db74">@&#34;Login Success&#34;</span>];
+    
+}
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">showTips:</span>(NSString <span style="color:#f92672">*</span>)tip {
+    UIAlertController <span style="color:#f92672">*</span>alertVC <span style="color:#f92672">=</span> [UIAlertController alertControllerWithTitle:<span style="color:#e6db74">@&#34;Tip&#34;</span> message:tip preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction <span style="color:#f92672">*</span>action <span style="color:#f92672">=</span> [UIAlertAction actionWithTitle:<span style="color:#e6db74">@&#34;cancel&#34;</span> style:UIAlertActionStyleCancel handler:nil];
+    [alertVC addAction:action];
+    
+    [self presentViewController:alertVC animated:true completion:nil];
+}
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">buttonEnable:</span>(<span style="color:#66d9ef">BOOL</span> )enable {
+    self.loginBtn.enabled <span style="color:#f92672">=</span> enable;
+}
+
+<span style="color:#75715e">#pragma mark - Getter
+</span><span style="color:#75715e"></span>
+- (LoginViewModel <span style="color:#f92672">*</span>)<span style="color:#a6e22e">vm</span> {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>_vm) {
+        _vm <span style="color:#f92672">=</span> [LoginViewModel new];
+    }
+    <span style="color:#66d9ef">return</span> _vm;
+}
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>这里全部的代码是我手写的,后面省略了一些UIKit相关的布局,想必以你的聪明才智应该已经能很轻松的将剩余的补全了吧。</p>
+<h2 id="注意事项">注意事项</h2>
+<p>这里有几点我认为应该注意的:</p>
+<ul>
+<li>vm与v之间不论通过什么传递值和响应,都要保持数据的单向流动。</li>
+<li>代理用weak,内存回收时会自动置为nil,</li>
+<li>全部model与viewModel中不应包含任何UIKit框架下的类</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>总而言之,我认为MVVM在我们的代码整体分工和应用架构的过程中应用还是十分优雅的,</p>
+<p>不过话说回来什么架构也罢，还是要看什么场景的，脱离了场景说这些都是扯淡不是吗</p>
+
+</div>
+
+
+        
+<div class="section bottom-menu">
+    
+<hr />
+<p>
+
+
+    
+        <a href="http://example.org/posts">back</a>
+        
+            &#183;
+        
+    
+
+    
+        
+            <a href="http://example.org/posts">posts</a>
+        
+    
+    
+        
+            &#183; 
+            <a href="http://example.org/memoryManage">memoryManage</a>
+        
+            &#183; 
+            <a href="http://example.org/portfolio">portfolio</a>
+        
+            &#183; 
+            <a href="http://example.org/about">who is Cb7d?</a>
+        
+    
+    &#183; 
+    <a href="http://example.org/">
+        main
+    </a>
+
+</p>
+</div>
+
+
+        <div class="section footer">Cb7d &lsquo;s blog.</div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>HTTP on Cb7d</title>
+    <link>http://example.org/tags/http/</link>
+    <description>Recent content in HTTP on Cb7d</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>All rights reserved - 2020</copyright>
+    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://example.org/tags/http/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>HTTPS</title>
+      <link>http://example.org/posts/https/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/https/</guid>
+      <description>HTTPS 最近又看了一遍 [HTTP权威指南]，每次想写个总结的时候都会拖延症爆发，今天决定简单总结下我们日常使用的的网络传输协议和TLS相关。
+OSI (Open System Interconnect) 先列一张能够体现不同协议在OSI七层模型中的表格
+   层级 层级名称 应用     7 应用层 例如HTTP、SMTP、SNMP、FTP、Telnet、SIP、SSH、NFS、RTSP、XMPP、Whois、ENRP、TLS   6 表示层 例如XDR、ASN.1、SMB、AFP、NCP   5 会话层 例如ASAP、ISO 8327 / CCITT X.225、RPC、NetBIOS、ASP、IGMP、Winsock、BSD sockets   4 传输层 例如TCP、UDP、RTP、SCTP、SPX、ATP、IL   3 网络层 例如IP、ICMP、IPX、BGP、OSPF、RIP、IGRP、EIGRP、ARP、RARP、X.25   2 数据链路层 例如以太网、令牌环、HDLC、帧中继、ISDN、ATM、IEEE 802.11、FDDI、PPP   1 物理层 例如线路、无线电、光纤    先从 TCP/IP 说起  IPS（Internet Protocol Suite）又叫做互联网协议套件、是一套网络传输协议家族，也就是我们熟悉的TCP/IP协议族，（又因为TCP、IP为不同层级的协议，当多个层级的协议共同工作时类似计算机科学中的堆栈、所以又叫做TCP/IP协议栈）
+ TCP/IP 中包含一系列用于处理数据通信的协议</description>
+    </item>
+    
+    <item>
+      <title>我们应该如何优化网络层</title>
+      <link>http://example.org/posts/network-layer-optimization/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/network-layer-optimization/</guid>
+      <description>Network Layer Optimization 网络层优化方案
+iOS应用中通常使用大量的服务端数据，那么如何保证我们的网络尽可能快速稳定的为用户传输数据其实也是开发中的重中之重，本篇笔者将会会分为几个角度来设计优化方案
+首先，一个请求包含了那些步骤
+ 客户端拼装发送请求 DNS解析域名解析 TCP握手 TLS/SSL握手 服务端接收处理数据并返回 客户端解析  在这些步骤当中，有很多我们可以优化的空间。废话不多说，看看我们能做啥
+客户端拼装请求阶段 我们在很多的请求中都是先从模型层获取数据再把数据通过一定的格式传递给服务端，那么这里就涉及到几个点
+ 服务端需要的数据是什么结构？ 传输的格式是怎样的？  一般的请求大多使用表单或是json的方式来序列化请求数据，如果某个接口可能提交大量的数据不妨使用 Protocol Buffers 和无服务端进行交互，还有，如果服务端所需要的是某中对象的列表的时候我们可以协商是否需要模型的全部属性交互，如果不需要的话我们就可以把多余的属性去掉再进行序列化
+DNS解析阶段 比如我们所要请求的host是https://bing.com，最终想要找到我们的服务是需要将域名解析为具体的IP
+ 本地缓存查询 如果缓存命中则使用本地缓存的ip信息 缓存失效或不存在则向DNS服务请求解析  通常会面临以下问题
+ DNS劫持 缓存失效导致需要重复请求  目前业内普遍采取的方法是采用 HTTP DNS 替换 LocalDNS ，绕过运营商DNS，向自建的具备DNS解析功能的web服务进行请求，替换后能够起到如下的作用
+ 可控刷新率，防止解析异常 直接以用户IP为导向，提升精准度 方便未来扩展  同时客户端可以配合服务端动态更新服务IP列表，选择网速最佳的进行请求
+TCP 部署服务的机器可以考虑更新更换TCP拥塞控制算法如BBR
+HTTP  Keep-Alive 复用TCP链接 Pipeline 管道化请求，是我们无需等待上一个请求完成就可以立即发起下一个  在用户使用App的时候，由于移动网络的特性可能导致网络信号的不稳定，我们可以根据当前用户的网络情况动态调整，比如在网络差的时候使用串行请求，延长超时时间
+使用 Throttle 对网络请求进行节流处理，比如 AFNetworking 的 throttleBandwidthWithPacketSize 方法
+业务方面 很多大列表类似的数据尽量使用分页处理，在用户重复频繁的访问某个页面的时候尤其有用，详情数据和列表数据内容可以做区分，列表页只返回最小化的数据更加有利于用户体验
+对于内嵌的HTML等资源做缓存，避免每次都请求，一般可以使用if-modify或是其他的标记来做
+当某个api请求失败后，如果并不是post等对数据更改的接口可以使用多次重试机制</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>DarkNet on Cb7d</title>
+    <link>http://example.org/tags/darknet/</link>
+    <description>Recent content in DarkNet on Cb7d</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>All rights reserved - 2020</copyright>
+    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://example.org/tags/darknet/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>ObjC 的 weak 修饰</title>
+      <link>http://example.org/posts/darknet/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/darknet/</guid>
+      <description>Darknet 很多人对暗网都很好奇，各种电视剧和电影也或多或少的提到了这个网络，我觉得有必要专门写一篇博客来向大家分享一下
+What is Darknet 先看一下维基百科词条「暗网」的定义
+ 暗网（英语：Dark web）是存在于黑暗网络、覆盖网络上的万维网内容，只能用特殊软件、特殊授权、或对计算机做特殊设置才能访问。暗网构成了深网的一小部分，深网网络没有被网络搜索引擎索引，有时“深网”这一术语被错误地用于指代暗网。 构成暗网的黑暗网络包括F2F的小型点对点网络以及由公共组织和个人运营的大型流行网络，如Tor、自由网、I2P和Riffle。暗网用户基于常规网络未加密的性质将其称为明网。Tor暗网可以称为洋葱区域（onionland），其使用网络顶级域后缀.onion和洋葱路由的流量匿名化技术。
+ 要了解什么是暗网，首先要先了解网络世界都有哪几部分，
+通俗来说，网络世界可以用这个列表来形容
+ 明网 深网  暗网    Tor Tor，全称为 the onion router。
+可以说，正是洋葱路由促进了暗网世界的发展，
+在1995年，由美国海军研究实验室的，开始研发了一哥项目，目的是在互联网上隐藏访问痕迹，由于其利用的技术像洋葱一样，剥开一层后仍会看到一层，所以叫做洋葱路由。
+该技术最初由美国海军研究办公室和国防部高级研究项目署(DARPA)资助。早期的开发由Paul Syverson、 Michael Reed 和 David Goldschla领导。这三个人都是供职美国军方的数学家和计算机系统的研究人员。
+Tor的最初目的并不是保护隐私，或者至少不是保护大部分人认为的那种“隐私”，它的目的是让情报人员的网上活动不被敌对国监控。在美国海军研究实验室1997 年的一篇论文中指出，“随着军事级别的通信设备日益依靠公共通讯网络，在使用公共通信基础设施时如何避免流量分析变得非常重要。此外，通信的匿名性也非常必要。”
+该项目初期进展缓慢，到 2002 年，来自海军研究机构的Paul Syverson 还留在项目里，两个MIT的毕业生 Roger Dingledine 和 Nick Mathewson 加入了项目。 这两个人不是海军研究实验室的正式雇员。而是作为 DARPA和海军研究实验室的高可靠性计算系统的合同工方式加入的。在后来的几年里，这三个人开发了一个新版的洋葱路由，也就是后来的 Tor(The Onion Router)。
+Tor访问的原理 那么，Tor是如何工作的呢，
+ 访问发生时，客户端要先向目录服务器获取中继节点列表 从节点列表中随机选择三个最优节点 使用节点建立链路（circuit），每一步的访问都会通过TLS加密发送  那么你可能会问，这样就无法被追踪了吗？其实重点就在于建立链路发送数据包的过程
+Tor的数据包Cell如下
+   CircID CMD DATA     2字节 1字节 509字节    其中，CircID由客户端随机生成，用来区分不同的链路，CMD表示数据包要执行的动作，DATA负载着发送的数据</description>
+    </item>
+    
+  </channel>
+</rss>

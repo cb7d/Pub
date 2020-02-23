@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="A new Hugo site.">
+<title>
+用Swift写个简单的区块链系统 - Cb7d
+</title>
+
+
+
+
+<link rel="shortcut icon" href="https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&amp;X-Amz-Date=20200223T024742Z&amp;X-Amz-Expires=432000&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://example.org/css/main.min.81bbafc4df93b11c1c3e2449464373c384aa4903731b4fc7a77dfcdd979e184f.css" integrity="sha256-gbuvxN&#43;TsRwcPiRJRkNzw4SqSQNzG0/Hp3383ZeeGE8=" crossorigin="anonymous" media="screen">
+
+
+
+ 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/tn.png"/>
+
+<meta name="twitter:title" content="用Swift写个简单的区块链系统"/>
+<meta name="twitter:description" content="BlockChainServer 源码地址
+最近身边的许多人都开始玩比特币，虽然本人不炒但是想稍微了解一下其中的原理，所以就练手写了一个简易版的区块链系统。
+So 、 What is the BlockChain (区块链) ? 这里引用一下Google的结果
+ 所谓区块链技术 ， 简称BT（Blockchain technology），也被称之为分布式账本技术，是一种互联网数据库技术，其特点是去中心化、公开透明，让每个人均可参与数据库记录。
+ Base (基础概念)  交易（Transaction）：一次操作，导致账本状态的一次改变，如添加一条记录； 区块（Block）：记录一段时间内发生的交易和状态结果，是对当前账本状态的一次共识； 链（Chain）：由一个个区块按照发生顺序串联而成，是整个状态变化的日志记录。   如果把区块链作为一个状态机，则每次交易就是试图改变一次状态，而每次共识生成的区块，就是参与者对于区块中所有交易内容导致状态改变的结果进行确认。
+ 简单理解就是:
+ 如果我们把数据库假设成一本账本，读写数据库就可以看做一种记账的行为，区块链技术的原理就是在一段时间内找出记账最快最好的人，由这个人来记账，然后将账本的这一页信息发给整个系统里的其他所有人。这也就相当于改变数据库所有的记录，发给全网的其他每个节点，所以区块链技术也称为分布式账本（distributed ledger）。
+ Vapor (用来开发服务端的Swift框架) 既然要用swift实现 ， 我在这里就选择vapor作为服务端框架来使用 ， vapor里面有意思的东西很多 ， 这里只介绍基本的操作而不深究其原理 。
+Install 前置条件 ， 这里我们使用macOS进行开发部署 ， 以下是需要软件和版本。
+ Install Xcode 9.3 or greater from the Mac App Store. Vapor requires Swift 4.1 or greater. Vapor Toolbox: 3.1.7 Vapor Framework: 3."/>
+
+<meta property="og:title" content="用Swift写个简单的区块链系统" />
+<meta property="og:description" content="BlockChainServer 源码地址
+最近身边的许多人都开始玩比特币，虽然本人不炒但是想稍微了解一下其中的原理，所以就练手写了一个简易版的区块链系统。
+So 、 What is the BlockChain (区块链) ? 这里引用一下Google的结果
+ 所谓区块链技术 ， 简称BT（Blockchain technology），也被称之为分布式账本技术，是一种互联网数据库技术，其特点是去中心化、公开透明，让每个人均可参与数据库记录。
+ Base (基础概念)  交易（Transaction）：一次操作，导致账本状态的一次改变，如添加一条记录； 区块（Block）：记录一段时间内发生的交易和状态结果，是对当前账本状态的一次共识； 链（Chain）：由一个个区块按照发生顺序串联而成，是整个状态变化的日志记录。   如果把区块链作为一个状态机，则每次交易就是试图改变一次状态，而每次共识生成的区块，就是参与者对于区块中所有交易内容导致状态改变的结果进行确认。
+ 简单理解就是:
+ 如果我们把数据库假设成一本账本，读写数据库就可以看做一种记账的行为，区块链技术的原理就是在一段时间内找出记账最快最好的人，由这个人来记账，然后将账本的这一页信息发给整个系统里的其他所有人。这也就相当于改变数据库所有的记录，发给全网的其他每个节点，所以区块链技术也称为分布式账本（distributed ledger）。
+ Vapor (用来开发服务端的Swift框架) 既然要用swift实现 ， 我在这里就选择vapor作为服务端框架来使用 ， vapor里面有意思的东西很多 ， 这里只介绍基本的操作而不深究其原理 。
+Install 前置条件 ， 这里我们使用macOS进行开发部署 ， 以下是需要软件和版本。
+ Install Xcode 9.3 or greater from the Mac App Store. Vapor requires Swift 4.1 or greater. Vapor Toolbox: 3.1.7 Vapor Framework: 3." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/posts/blockchain/" />
+<meta property="og:image" content="http://example.org/tn.png"/>
+<meta property="article:published_time" content="2019-02-19T10:46:42+08:00" />
+<meta property="article:modified_time" content="2019-02-19T10:46:42+08:00" /><meta property="og:site_name" content="Cb7d" />
+
+
+    
+
+    
+    
+    
+    <title>
+        
+        用Swift写个简单的区块链系统
+        
+    </title>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="section" id="title">用Swift写个简单的区块链系统</div>
+
+        
+<div class="section" id="content">
+    Tue Feb 19, 2019 &#183; 1629 words
+    <div class="tag-container">
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blog/">
+                blog
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/swift/">
+                Swift
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blockchain/">
+                BlockChain
+            </a>
+        </span>
+        
+        
+    </div>
+    <hr/>
+    <h1 id="blockchainserver">BlockChainServer</h1>
+<p><a href="https://github.com/FelixScat/blockChainServer">源码地址</a></p>
+<p>最近身边的许多人都开始玩比特币，虽然本人不炒但是想稍微了解一下其中的原理，所以就练手写了一个简易版的区块链系统。</p>
+<h3 id="so--what-is-the-blockchain-区块链-">So 、 What is the BlockChain (区块链) ?</h3>
+<p>这里引用一下Google的结果</p>
+<blockquote>
+<p>所谓区块链技术 ， 简称BT（Blockchain technology），也被称之为分布式账本技术，是一种互联网数据库技术，其特点是去中心化、公开透明，让每个人均可参与数据库记录。</p>
+</blockquote>
+<h3 id="base-基础概念">Base (基础概念)</h3>
+<ul>
+<li>交易（Transaction）：一次操作，导致账本状态的一次改变，如添加一条记录；</li>
+<li>区块（Block）：记录一段时间内发生的交易和状态结果，是对当前账本状态的一次共识；</li>
+<li>链（Chain）：由一个个区块按照发生顺序串联而成，是整个状态变化的日志记录。</li>
+</ul>
+<blockquote>
+<p>如果把区块链作为一个状态机，则每次交易就是试图改变一次状态，而每次共识生成的区块，就是参与者对于区块中所有交易内容导致状态改变的结果进行确认。</p>
+</blockquote>
+<p>简单理解就是:</p>
+<blockquote>
+<p>如果我们把数据库假设成一本账本，读写数据库就可以看做一种记账的行为，区块链技术的原理就是在一段时间内找出记账最快最好的人，由这个人来记账，然后将账本的这一页信息发给整个系统里的其他所有人。这也就相当于改变数据库所有的记录，发给全网的其他每个节点，所以区块链技术也称为分布式账本（distributed ledger）。</p>
+</blockquote>
+<h3 id="vapor-用来开发服务端的swift框架">Vapor (用来开发服务端的Swift框架)</h3>
+<p>既然要用swift实现 ， 我在这里就选择vapor作为服务端框架来使用 ， vapor里面有意思的东西很多 ， 这里只介绍基本的操作而不深究其原理 。</p>
+<h3 id="install">Install</h3>
+<p>前置条件 ， 这里我们使用macOS进行开发部署 ， 以下是需要软件和版本。</p>
+<ul>
+<li>Install Xcode 9.3 or greater from the Mac App Store.</li>
+<li>Vapor requires Swift 4.1 or greater.</li>
+<li>Vapor Toolbox: 3.1.7</li>
+<li>Vapor Framework: 3.0.8</li>
+<li>homeBrew</li>
+</ul>
+<p>接着使用homeBrew安装</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brew install vapor/tap/vapor
+</code></pre></div><p>如果一切输出正常的话我们就可以继续啦。</p>
+<h3 id="get-started">Get Started</h3>
+<p>现在vapor已经装好了 ， 我们可以先把基本的准备工作弄好
+使用vapor初始化工程</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">vapor new blockChainServer
+</code></pre></div><p>生成工程文件</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">vapor xcode
+</code></pre></div><p>接着打开 blockChainServer.xcodeproj 文件 ， 在导航上的schema上选择 run ，接着按下 <code>Command</code> + <code>R</code>
+这时你应能够在控制台看到输出的server地址了</p>
+<h2 id="practice-begin">Practice Begin</h2>
+<p>到现在我们一切准备工作都就绪了 ， 那么开始鼓捣个区块链api出来吧 。</p>
+<h3 id="base-model">Base Model</h3>
+<p>区块链的基本概念上面介绍了，包含以下几类，我们使用oop可以抽象出以下一些class</p>
+<ul>
+<li>Transaction     交易</li>
+<li>Block           区块</li>
+<li>Blockchain      区块链</li>
+<li>BlockChainNode  区块链节点</li>
+</ul>
+<p>排列由下向上存在集合关系。</p>
+<p><strong>其实这里面最后应该加上一个区块网络不过这里我们暂时不需要实现全部网络，这里我们先搭建一个内网环境的来练练手</strong></p>
+<p>下面分别来看下几个model的代码
+(ps:这里的框架添加的协议和扩展很多，不在此过多介绍，请把关注点放在class本身)</p>
+<p>Transaction.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Foundation</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">FluentSQLite</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Transaction</span>: Codable,SQLiteModel {
+    <span style="color:#66d9ef">var</span> id: Int?
+    <span style="color:#66d9ef">var</span> from: String
+    <span style="color:#66d9ef">var</span> to: String
+    <span style="color:#66d9ef">var</span> amount: Double
+    
+    <span style="color:#66d9ef">init</span>(from: String, to: String, amount: Double) {
+        <span style="color:#66d9ef">self</span>.from = from
+        <span style="color:#66d9ef">self</span>.to = to
+        <span style="color:#66d9ef">self</span>.amount = amount
+    }
+}
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Transaction</span>: Content { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Transaction</span>: Migration { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Transaction</span>: Parameter { }
+</code></pre></div><p>这里我们可以看到定义了几个property ，</p>
+<ul>
+<li>id是SQLiteModel协议需要实现的 ， 这里只要记住是为了数据持久化就好</li>
+<li>to : 交易的接收方</li>
+<li>from : 交易的发起方</li>
+<li>amount : 金额</li>
+</ul>
+<p>Block.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">FluentSQLite</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Block</span>: Codable,SQLiteModel {
+    <span style="color:#66d9ef">var</span> id: Int?
+    <span style="color:#66d9ef">var</span> index: Int = <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">var</span> dateCreated: String
+    <span style="color:#66d9ef">var</span> previousHash: String!
+    <span style="color:#66d9ef">var</span> hash: String!
+    <span style="color:#66d9ef">var</span> nonce: Int
+    <span style="color:#66d9ef">var</span> message: String = <span style="color:#e6db74">&#34;&#34;</span>
+    <span style="color:#66d9ef">private</span> (<span style="color:#66d9ef">set</span>) <span style="color:#66d9ef">var</span> transactions: [Transaction] = [Transaction]()
+    
+    <span style="color:#66d9ef">var</span> key: String {
+        <span style="color:#66d9ef">get</span> {
+            <span style="color:#66d9ef">let</span> transactionsData = <span style="color:#66d9ef">try</span>! JSONEncoder().encode(transactions)
+            <span style="color:#66d9ef">let</span> transactionsJSONString = String(data: transactionsData, encoding: .utf8)
+            
+            <span style="color:#66d9ef">return</span> String(index) <span style="color:#f92672">+</span> dateCreated <span style="color:#f92672">+</span> previousHash <span style="color:#f92672">+</span> transactionsJSONString! <span style="color:#f92672">+</span> String(nonce)
+        }
+    }
+    
+    @discardableResult
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">addTransaction</span>(transaction: Transaction) -&gt; Block{
+        transactions.append(transaction)
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">self</span>
+    }
+    
+    <span style="color:#66d9ef">init</span>() {
+        dateCreated = Date().toString()
+        nonce = <span style="color:#ae81ff">0</span>
+        message = <span style="color:#e6db74">&#34;挖出新的区块&#34;</span>
+    }
+    
+    <span style="color:#66d9ef">init</span>(transaction: Transaction) {
+        dateCreated = Date().toString()
+        nonce = <span style="color:#ae81ff">0</span>
+        addTransaction(transaction: transaction)
+    }
+}
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Block</span>: Content { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Block</span>: Migration { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Block</span>: Parameter { }
+</code></pre></div><ul>
+<li>index : 区块序号</li>
+<li>dateCreated : 创建日期</li>
+<li>previousHash : 前一个区块的哈希值</li>
+<li>hash : 当前区块的哈希值</li>
+<li>nonce : 先记住和工作量证明有关</li>
+<li>message : 这里是为了我们看到输出</li>
+</ul>
+<p>Blockchain.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Foundation</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">FluentSQLite</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Blockchain</span>: Codable,SQLiteModel {
+    
+    <span style="color:#66d9ef">var</span> id: Int?
+    
+    <span style="color:#66d9ef">var</span> blocks: [Block] = [Block]()
+    
+    <span style="color:#66d9ef">init</span>() {
+        
+    }
+    
+    <span style="color:#66d9ef">init</span>(<span style="color:#66d9ef">_</span> genesisBlock: Block) {
+        <span style="color:#66d9ef">self</span>.addBlock(genesisBlock)
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">addBlock</span>(<span style="color:#66d9ef">_</span> block: Block) {
+        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">self</span>.blocks.isEmpty {
+            <span style="color:#75715e">// 添加创世区块</span>
+            <span style="color:#75715e">// 第一个区块没有 previous hash</span>
+            block.previousHash = <span style="color:#e6db74">&#34;0&#34;</span>
+        } <span style="color:#66d9ef">else</span> {
+            <span style="color:#66d9ef">let</span> previousBlock = getPreviousBlock()
+            block.previousHash = previousBlock.hash
+            block.index = <span style="color:#66d9ef">self</span>.blocks.count
+        }
+        
+        block.hash = generateHash(<span style="color:#66d9ef">for</span>: block)
+        <span style="color:#66d9ef">self</span>.blocks.append(block)
+        block.message = <span style="color:#e6db74">&#34;此区块已添加至区块链&#34;</span>
+    }
+    
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getPreviousBlock</span>() -&gt; Block {
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">self</span>.blocks[<span style="color:#66d9ef">self</span>.blocks.count <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>]
+    }
+    
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">displayBlock</span>(<span style="color:#66d9ef">_</span> block: Block) {
+        print(<span style="color:#e6db74">&#34;------ 第 </span><span style="color:#e6db74">\(</span>block.index<span style="color:#e6db74">)</span><span style="color:#e6db74"> 个区块 --------&#34;</span>)
+        print(<span style="color:#e6db74">&#34;创建日期：</span><span style="color:#e6db74">\(</span>block.dateCreated<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+        <span style="color:#75715e">// print(&#34;数据：\(block.data)&#34;)</span>
+        print(<span style="color:#e6db74">&#34;Nonce：</span><span style="color:#e6db74">\(</span>block.nonce<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+        print(<span style="color:#e6db74">&#34;前一个区块的哈希值：</span><span style="color:#e6db74">\(</span>block.previousHash!<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+        print(<span style="color:#e6db74">&#34;哈希值：</span><span style="color:#e6db74">\(</span>block.hash!<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+    }
+    
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">generateHash</span>(<span style="color:#66d9ef">for</span> block: Block) -&gt; String {
+        <span style="color:#66d9ef">var</span> hash = block.key.sha1Hash()
+        
+        <span style="color:#75715e">// 设置工作量证明</span>
+        <span style="color:#66d9ef">while</span>(<span style="color:#f92672">!</span>hash.hasPrefix(<span style="color:#e6db74">&#34;11&#34;</span>)) {
+            block.nonce <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+            hash = block.key.sha1Hash()
+            print(hash)
+        }
+        
+        <span style="color:#66d9ef">return</span> hash
+    }
+}
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Blockchain</span>: Content { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Blockchain</span>: Migration { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Blockchain</span>: Parameter { }
+</code></pre></div><p>BlockChainNode.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">FluentSQLite</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BlockChainNode</span>: Codable,SQLiteModel {
+    <span style="color:#66d9ef">var</span> id: Int?
+    <span style="color:#66d9ef">var</span> address :String
+    
+    <span style="color:#66d9ef">init</span>(addr:String) {
+        address = addr
+    }
+}
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">BlockChainNode</span>: Content { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">BlockChainNode</span>: Migration { }
+
+<span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">BlockChainNode</span>: Parameter { }
+</code></pre></div><ul>
+<li>address : 节点地址</li>
+</ul>
+<h3 id="action">Action</h3>
+<p>这里涉及到的事件主要是计算hash ， 我们在这里面给String 添加一个extension</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">String</span> {
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">sha1Hash</span>() -&gt; String {
+        <span style="color:#66d9ef">let</span> task = Process()
+        task.launchPath = <span style="color:#e6db74">&#34;/usr/bin/shasum&#34;</span>
+        task.arguments = []
+        
+        <span style="color:#66d9ef">let</span> inputPipe = Pipe()
+        
+        inputPipe.fileHandleForWriting.write(<span style="color:#66d9ef">self</span>.data(using: .utf8)<span style="color:#f92672">!</span>)
+        
+        inputPipe.fileHandleForWriting.closeFile()
+        
+        <span style="color:#66d9ef">let</span> outputPipe = Pipe()
+        task.standardOutput = outputPipe
+        task.standardInput = inputPipe
+        task.launch()
+        
+        <span style="color:#66d9ef">let</span> data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        <span style="color:#66d9ef">let</span> hash = String(data: data, encoding: .utf8)<span style="color:#f92672">!</span>
+        <span style="color:#66d9ef">return</span> hash.replacingOccurrences(of: <span style="color:#e6db74">&#34;  -</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, with: <span style="color:#e6db74">&#34;&#34;</span>)
+    }
+}
+</code></pre></div><p>给date也添加一个便于我们输出区块创建时间</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">Date</span> {
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">toString</span>() -&gt; String {
+        <span style="color:#66d9ef">let</span> formatter = DateFormatter()
+        formatter.dateFormat = <span style="color:#e6db74">&#34;yyyy-MM-dd HH:mm:ss&#34;</span>
+        <span style="color:#66d9ef">return</span> formatter.string(from: <span style="color:#66d9ef">self</span>)
+    }
+}
+</code></pre></div><h3 id="service">Service</h3>
+<p>在这里我们把所有对区块链的操作抽象为一个service类</p>
+<p>BlockchainService.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Foundation</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BlockchainService</span> {
+    
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">var</span> blockchain: Blockchain = Blockchain()
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">var</span> nodes = [BlockChainNode]()
+    
+    <span style="color:#66d9ef">init</span>() {
+        
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">addBlock</span>(<span style="color:#66d9ef">_</span> block: Block) -&gt; Block {
+        <span style="color:#66d9ef">self</span>.blockchain.addBlock(block)
+        <span style="color:#66d9ef">return</span> block
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getLastBlock</span>() -&gt; Block {
+        
+        <span style="color:#66d9ef">guard</span> <span style="color:#66d9ef">let</span> lastB = <span style="color:#66d9ef">self</span>.blockchain.blocks.last <span style="color:#66d9ef">else</span> {
+            <span style="color:#66d9ef">return</span> addBlock(Block())
+        }
+        <span style="color:#66d9ef">return</span> lastB;
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getBlockchain</span>() -&gt; Blockchain {
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">self</span>.blockchain
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">registerNode</span>(<span style="color:#66d9ef">_</span> node:BlockChainNode) -&gt; BlockChainNode {
+        <span style="color:#66d9ef">self</span>.nodes.append(node)
+        <span style="color:#66d9ef">return</span> node
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getAllNodes</span>() -&gt; [BlockChainNode] {
+        <span style="color:#66d9ef">return</span> nodes
+    }
+}
+</code></pre></div><h3 id="controller--router">Controller &amp; Router</h3>
+<p>这里我们基本完成了所有基本模型的搭建 ， 现在需要对我们的server进行操作 ， 让我们可以方便的通过curl调用我们的区块链系统 。</p>
+<p>BlockChainController.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Foundation</span>
+<span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">BCError</span>:LocalizedError {
+    <span style="color:#66d9ef">let</span> name:String
+}
+
+<span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BlockChainController</span> {
+    
+    <span style="color:#66d9ef">let</span> bcService = BlockchainService()
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">addBlock</span>(<span style="color:#66d9ef">_</span> req: Request) <span style="color:#66d9ef">throws</span> -&gt; Future&lt;Block&gt; {
+        <span style="color:#66d9ef">return</span> bcService.addBlock(Block()).save(on: req)
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">addTransaction</span>(<span style="color:#66d9ef">_</span> req: Request) <span style="color:#66d9ef">throws</span> -&gt; Future&lt;Block&gt; {
+        
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">try</span> req.content.decode(Transaction.<span style="color:#66d9ef">self</span>).flatMap{ transation <span style="color:#66d9ef">in</span>
+            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">self</span>.bcService.getLastBlock().addTransaction(transaction: transation).save(on: req)
+        }
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">findBlockChain</span>(<span style="color:#66d9ef">_</span> req: Request) <span style="color:#66d9ef">throws</span> -&gt; Future&lt;Blockchain&gt; {
+        <span style="color:#66d9ef">return</span> bcService.getBlockchain().save(on: req)
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">registeNode</span>(<span style="color:#66d9ef">_</span> req: Request) <span style="color:#66d9ef">throws</span> -&gt; Future&lt;BlockChainNode&gt; {
+        
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">try</span> req.content.decode(BlockChainNode.<span style="color:#66d9ef">self</span>).flatMap{ node <span style="color:#66d9ef">in</span>
+            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">self</span>.bcService.registerNode(node).save(on: req)
+        }
+    }
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">allNodes</span>(<span style="color:#66d9ef">_</span> req: Request) <span style="color:#66d9ef">throws</span> -&gt; Future<span style="color:#f92672">&lt;</span>[BlockChainNode]<span style="color:#f92672">&gt;</span> {
+        
+        <span style="color:#66d9ef">return</span> BlockChainNode.query(on: req).all()
+    }
+    
+    
+    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">resolve</span>(<span style="color:#66d9ef">_</span> req: Request) <span style="color:#66d9ef">throws</span> -&gt; Future&lt;Blockchain&gt; {
+
+        <span style="color:#66d9ef">let</span> promise = req.eventLoop.newPromise(Blockchain.<span style="color:#66d9ef">self</span>)
+        
+        bcService.getAllNodes().forEach { node <span style="color:#66d9ef">in</span>
+            
+            <span style="color:#66d9ef">guard</span> <span style="color:#66d9ef">let</span> url = URL(string: <span style="color:#e6db74">&#34;http://</span><span style="color:#e6db74">\(</span>node.address<span style="color:#e6db74">)</span><span style="color:#e6db74">/blockchain&#34;</span>) <span style="color:#66d9ef">else</span> {<span style="color:#66d9ef">return</span> promise.fail(error: BCError(name: <span style="color:#e6db74">&#34;node error&#34;</span>))}
+            
+            URLSession.shared.dataTask(with: url, completionHandler: { (data, <span style="color:#66d9ef">_</span>, <span style="color:#66d9ef">_</span>) <span style="color:#66d9ef">in</span>
+                <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> data = data {
+                    <span style="color:#66d9ef">guard</span> <span style="color:#66d9ef">let</span> bc = <span style="color:#66d9ef">try</span>? JSONDecoder().decode(Blockchain.<span style="color:#66d9ef">self</span>, from: data) <span style="color:#66d9ef">else</span> {<span style="color:#66d9ef">return</span> promise.fail(error: BCError(name: <span style="color:#e6db74">&#34;json error&#34;</span>))}
+                    
+                    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">self</span>.bcService.getBlockchain().blocks.count <span style="color:#f92672">&lt;</span> bc.blocks.count {
+                        <span style="color:#66d9ef">self</span>.bcService.getBlockchain().blocks = bc.blocks
+                    }
+                    promise.succeed(result: <span style="color:#66d9ef">self</span>.bcService.getBlockchain())
+                } <span style="color:#66d9ef">else</span> {
+                    promise.fail(error: BCError(name: <span style="color:#e6db74">&#34;data Error&#34;</span>))
+                }
+            }).resume()
+        }
+        <span style="color:#66d9ef">return</span> promise.futureResult
+    }
+}
+</code></pre></div><p>routes.swift</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Vapor</span>
+
+<span style="color:#75715e">/// Register your application&#39;s routes here.</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">routes</span>(<span style="color:#66d9ef">_</span> router: Router) <span style="color:#66d9ef">throws</span> {
+    <span style="color:#75715e">// Basic &#34;Hello, world!&#34; example</span>
+    router.<span style="color:#66d9ef">get</span>(<span style="color:#e6db74">&#34;hello&#34;</span>) { req <span style="color:#66d9ef">in</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Hello, world!&#34;</span>
+    }
+    
+    <span style="color:#66d9ef">let</span> bcc = BlockChainController()
+    router.post(<span style="color:#e6db74">&#34;block&#34;</span>, use: bcc.addBlock)
+    router.post(<span style="color:#e6db74">&#34;transaction&#34;</span>, use: bcc.addTransaction)
+    router.<span style="color:#66d9ef">get</span>(<span style="color:#e6db74">&#34;blockchain&#34;</span>, use: bcc.findBlockChain)
+    router.post(<span style="color:#e6db74">&#34;node&#34;</span>, use: bcc.registeNode)
+    router.<span style="color:#66d9ef">get</span>(<span style="color:#e6db74">&#34;node&#34;</span>, use: bcc.allNodes)
+    router.post(<span style="color:#e6db74">&#34;resolve&#34;</span>, use: bcc.resolve)
+}
+</code></pre></div><p>现在解释一下我们注册的api都是干啥的</p>
+<p>ps:API层遵守restfull</p>
+<ul>
+<li>post(&ldquo;block&rdquo;, use: bcc.addBlock) 增加一个区块</li>
+<li>post(&ldquo;transaction&rdquo;, use: bcc.addTransaction) 新增一笔交易</li>
+<li>get(&ldquo;blockchain&rdquo;, use: bcc.findBlockChain) 查询区块链</li>
+<li>post(&ldquo;node&rdquo;, use: bcc.registeNode) 增加节点</li>
+<li>get(&ldquo;node&rdquo;, use: bcc.allNodes) 获取全部节点</li>
+<li>post(&ldquo;resolve&rdquo;, use: bcc.resolve) 解决冲突</li>
+</ul>
+<h3 id="example">Example</h3>
+<p>下面我们可以让服务运行起来 ， 然后通过curl命令行来调用区块链系统 ，</p>
+<h4 id="编译工程">编译工程</h4>
+<p>进入我们的工程目录 ， 执行命令</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">vapor build
+</code></pre></div><p>你应能看到以下输出</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Building Project <span style="color:#f92672">[</span>Done<span style="color:#f92672">]</span>
+</code></pre></div><p>这说明我们的工程可以运行了</p>
+<h4 id="运行工程">运行工程</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">vapor run serve --port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span>
+</code></pre></div><p>我们在本地8080端口上开启我们的服务</p>
+<p>这时应能看到如下输出</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Running blockChainServer ...
+<span style="color:#f92672">[</span> INFO <span style="color:#f92672">]</span> Migrating <span style="color:#e6db74">&#39;sqlite&#39;</span> database <span style="color:#f92672">(</span>/Users/felix/Documents/TestFolder/blockChainServer/.build/checkouts/fluent.git-6251908308727715749/Sources/Fluent/Migration/MigrationConfig.swift:69<span style="color:#f92672">)</span>
+<span style="color:#f92672">[</span> INFO <span style="color:#f92672">]</span> Preparing migration <span style="color:#e6db74">&#39;Todo&#39;</span> <span style="color:#f92672">(</span>/Users/felix/Documents/TestFolder/blockChainServer/.build/checkouts/fluent.git-6251908308727715749/Sources/Fluent/Migration/Migrations.swift:111<span style="color:#f92672">)</span>
+<span style="color:#f92672">[</span> INFO <span style="color:#f92672">]</span> Preparing migration <span style="color:#e6db74">&#39;Block&#39;</span> <span style="color:#f92672">(</span>/Users/felix/Documents/TestFolder/blockChainServer/.build/checkouts/fluent.git-6251908308727715749/Sources/Fluent/Migration/Migrations.swift:111<span style="color:#f92672">)</span>
+<span style="color:#f92672">[</span> INFO <span style="color:#f92672">]</span> Preparing migration <span style="color:#e6db74">&#39;Blockchain&#39;</span> <span style="color:#f92672">(</span>/Users/felix/Documents/TestFolder/blockChainServer/.build/checkouts/fluent.git-6251908308727715749/Sources/Fluent/Migration/Migrations.swift:111<span style="color:#f92672">)</span>
+<span style="color:#f92672">[</span> INFO <span style="color:#f92672">]</span> Preparing migration <span style="color:#e6db74">&#39;BlockChainNode&#39;</span> <span style="color:#f92672">(</span>/Users/felix/Documents/TestFolder/blockChainServer/.build/checkouts/fluent.git-6251908308727715749/Sources/Fluent/Migration/Migrations.swift:111<span style="color:#f92672">)</span>
+<span style="color:#f92672">[</span> INFO <span style="color:#f92672">]</span> Migrations complete <span style="color:#f92672">(</span>/Users/felix/Documents/TestFolder/blockChainServer/.build/checkouts/fluent.git-6251908308727715749/Sources/Fluent/Migration/MigrationConfig.swift:73<span style="color:#f92672">)</span>
+<span style="color:#f92672">[</span>Deprecated<span style="color:#f92672">]</span> --option<span style="color:#f92672">=</span>value syntax is deprecated. Please use --option value <span style="color:#f92672">(</span>with no <span style="color:#f92672">=)</span> instead.
+Server starting on http://localhost:8080
+</code></pre></div><p>现在我们只要用api调用以下 ， 本机的区块链系统就会响应了 ， 让我们试一下吧</p>
+<h4 id="创建区块">创建区块</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -X POST localhost:8080/block
+</code></pre></div><p>你会在一段时间后看到响应</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:19:01&#34;</span>,
+    <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1124aa2a5867abee8b9cc3a3f4051b6665f89e26&#34;</span>,
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+    <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">0</span>,
+    <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+    <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">193</span>,
+    <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>,
+    <span style="color:#f92672">&#34;transactions&#34;</span>: []
+}
+</code></pre></div><p>我们的第一个block已经创建成功并且被加入区块链里了 ， 他的previousHash为“0”是因为他是创世区块 。</p>
+<h4 id="添加交易">添加交易</h4>
+<p>我们可以在这里添加几笔交易看看</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -X POST localhost:8080/transaction --data <span style="color:#e6db74">&#34;from=Felix&amp;to=mayun&amp;amount=100&#34;</span> | python -m json.tool
+</code></pre></div><p>data里面表示 Felix向mayun转账100 每次添加后你将会得到区块的最新信息</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:19:01&#34;</span>,
+    <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1124aa2a5867abee8b9cc3a3f4051b6665f89e26&#34;</span>,
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+    <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">0</span>,
+    <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+    <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">193</span>,
+    <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>,
+    <span style="color:#f92672">&#34;transactions&#34;</span>: [
+        {
+            <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">100</span>,
+            <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>,
+            <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>
+        }
+    ]
+}
+</code></pre></div><h4 id="查询链">查询链</h4>
+<p>我们可以重复以上操作几次,然后查看整个区块链信息</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -X GET localhost:8080/blockchain | python -m json.tool
+</code></pre></div><p>会看到如下输出</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;blocks&#34;</span>: [
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:19:01&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1124aa2a5867abee8b9cc3a3f4051b6665f89e26&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">0</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">193</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">100</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">100</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:27:39&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;11bec5f7bf8226c62119adfbb03ad37d24267092&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">2</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">1</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">277</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;1124aa2a5867abee8b9cc3a3f4051b6665f89e26&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">100</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">100</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>
+                }
+            ]
+        }
+    ],
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>
+}
+</code></pre></div><p>我们可以看到Felix不停的向mayun转100块 ， 真不要脸 。</p>
+<h4 id="节点以及解决冲突">节点以及解决冲突</h4>
+<p>区块链同时存在与多个主机上,也就是说会有很多的block-chain-server运行,而对于不同的运算会有多个解产生,这就是冲突问题了,那么我们看下冲突解决的过程</p>
+<ul>
+<li>首先,我们在8081端口同时开启一个服务</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">vapor run serve --port<span style="color:#f92672">=</span><span style="color:#ae81ff">8081</span>
+</code></pre></div><ul>
+<li>然后添加几个区块和交易,因为我们要验证解决冲突,所以应该比运行在8080端口上的区块多。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -X POST localhost:8081/block | python -m json.tool
+</code></pre></div><ul>
+<li>重复几次操作 ， 最后看下8081伤的blockchain</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;blocks&#34;</span>: [
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:35:15&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1152cb1aac50abd803a4589f28c7e054db207e23&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">0</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">215</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:37:18&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1127f8c712ae3205ccbab9788392bcd190b8b6b1&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">2</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">1</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">380</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;1152cb1aac50abd803a4589f28c7e054db207e23&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:37:39&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;11b5d293c3068081f1771f14f96a3e450f282171&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">3</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">2</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">64</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;1127f8c712ae3205ccbab9788392bcd190b8b6b1&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:37:45&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;11d97dfca7cc7a67c22b9df06017768fca0a193f&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">4</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">3</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">125</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;11b5d293c3068081f1771f14f96a3e450f282171&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:38:03&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;115a991bd5d2ebe6e232b421965ab852b97a4202&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">5</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">4</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">220</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;11d97dfca7cc7a67c22b9df06017768fca0a193f&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        }
+    ],
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>
+}
+</code></pre></div><ul>
+<li>然后我们要让8080知道有这么一个节点</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -X POST localhost:8080/node --data <span style="color:#e6db74">&#34;address=localhost:8081&#34;</span> | python -m json.tool
+</code></pre></div><ul>
+<li>我们会看到节点已经注册成功了</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">{</span>
+    <span style="color:#e6db74">&#34;address&#34;</span>: <span style="color:#e6db74">&#34;localhost:8081&#34;</span>,
+    <span style="color:#e6db74">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><ul>
+<li>这时我们让8080去主动解决冲突</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl -s -X POST localhost:8080/resolve | python -m json.tool
+</code></pre></div><ul>
+<li>再查看8080上的区块链,发现已经被替换为较长的8081上的blocks了。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;blocks&#34;</span>: [
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:35:15&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1152cb1aac50abd803a4589f28c7e054db207e23&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">0</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">215</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:37:18&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;1127f8c712ae3205ccbab9788392bcd190b8b6b1&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">2</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">1</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">380</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;1152cb1aac50abd803a4589f28c7e054db207e23&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:37:39&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;11b5d293c3068081f1771f14f96a3e450f282171&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">3</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">2</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">64</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;1127f8c712ae3205ccbab9788392bcd190b8b6b1&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:37:45&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;11d97dfca7cc7a67c22b9df06017768fca0a193f&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">4</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">3</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">125</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;11b5d293c3068081f1771f14f96a3e450f282171&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        },
+        {
+            <span style="color:#f92672">&#34;dateCreated&#34;</span>: <span style="color:#e6db74">&#34;2018-08-11 17:38:03&#34;</span>,
+            <span style="color:#f92672">&#34;hash&#34;</span>: <span style="color:#e6db74">&#34;115a991bd5d2ebe6e232b421965ab852b97a4202&#34;</span>,
+            <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">5</span>,
+            <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">4</span>,
+            <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;\u6b64\u533a\u5757\u5df2\u6dfb\u52a0\u81f3\u533a\u5757\u94fe&#34;</span>,
+            <span style="color:#f92672">&#34;nonce&#34;</span>: <span style="color:#ae81ff">220</span>,
+            <span style="color:#f92672">&#34;previousHash&#34;</span>: <span style="color:#e6db74">&#34;11d97dfca7cc7a67c22b9df06017768fca0a193f&#34;</span>,
+            <span style="color:#f92672">&#34;transactions&#34;</span>: [
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                },
+                {
+                    <span style="color:#f92672">&#34;amount&#34;</span>: <span style="color:#ae81ff">200</span>,
+                    <span style="color:#f92672">&#34;from&#34;</span>: <span style="color:#e6db74">&#34;mayun&#34;</span>,
+                    <span style="color:#f92672">&#34;to&#34;</span>: <span style="color:#e6db74">&#34;Felix&#34;</span>
+                }
+            ]
+        }
+    ],
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>
+}
+</code></pre></div><h3 id="summary">Summary</h3>
+<p>可以看到大概区块链的设计还是比较有意思的，细节部分请不要在意（比如sha1和prefix“11” 😄）
+基本的介绍就到这里，建议自己动手实践一遍，还是蛮有意思的。</p>
+
+</div>
+
+
+        
+<div class="section bottom-menu">
+    
+<hr />
+<p>
+
+
+    
+        <a href="http://example.org/posts">back</a>
+        
+            &#183;
+        
+    
+
+    
+        
+            <a href="http://example.org/posts">posts</a>
+        
+    
+    
+        
+            &#183; 
+            <a href="http://example.org/memoryManage">memoryManage</a>
+        
+            &#183; 
+            <a href="http://example.org/portfolio">portfolio</a>
+        
+            &#183; 
+            <a href="http://example.org/about">who is Cb7d?</a>
+        
+    
+    &#183; 
+    <a href="http://example.org/">
+        main
+    </a>
+
+</p>
+</div>
+
+
+        <div class="section footer">Cb7d &lsquo;s blog.</div>
+    </div>
+</body>
+
+</html>

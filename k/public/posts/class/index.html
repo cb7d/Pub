@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="A new Hugo site.">
+<title>
+聊聊 ObjC 的 Class - Cb7d
+</title>
+
+
+
+
+<link rel="shortcut icon" href="https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&amp;X-Amz-Date=20200223T024742Z&amp;X-Amz-Expires=432000&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://example.org/css/main.min.81bbafc4df93b11c1c3e2449464373c384aa4903731b4fc7a77dfcdd979e184f.css" integrity="sha256-gbuvxN&#43;TsRwcPiRJRkNzw4SqSQNzG0/Hp3383ZeeGE8=" crossorigin="anonymous" media="screen">
+
+
+
+ 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/tn.png"/>
+
+<meta name="twitter:title" content="聊聊 ObjC 的 Class"/>
+<meta name="twitter:description" content="Class @interface NSObject &lt;NSObject&gt; { Class isa OBJC_ISA_AVAILABILITY; @end ObjC是一门面向对象的语言，参考了Smalltalk的消息传递机制，那么对于开发者来说，对象、类、元类这些究竟是什么呢，他们之间的关系又是怎样的呢，这篇主要写一点对类结构的总结，偏向原理
+实例对象 #import &lt;Foundation/Foundation.h&gt;  @interface Person: NSObject @property (nonatomic, copy) NSString *name; @end @implementation Person - (void)greeting { NSLog(@&#34;Hi, I&#39;m %@&#34;, self.name); } @end int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Person *person = [[Person alloc] init]; person.name = @&#34;Alice&#34;; [person greeting]; } return 0; } 我们首先实例化一个Person对象，然后调用setter为name赋值，再调用person的实例方法greeting
+我们看一下使用clang转换之后的代码
+int main(int argc, const char * argv[]) { /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; Person *person = ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass(&#34;Person&#34;), sel_registerName(&#34;alloc&#34;)), sel_registerName(&#34;init&#34;)); ((void (*)(id, SEL, NSString *))(void *)objc_msgSend)((id)person, sel_registerName(&#34;setName:&#34;), (NSString *)&amp;__NSConstantStringImpl__var_folders_60_yqdp8_yn6vbd1tl6s3k479sr0000gp_T_main_5be332_mi_1); ((void (*)(id, SEL))(void *)objc_msgSend)((id)person, sel_registerName(&#34;greeting&#34;)); } return 0; } 代码的大体逻辑是这样的："/>
+
+<meta property="og:title" content="聊聊 ObjC 的 Class" />
+<meta property="og:description" content="Class @interface NSObject &lt;NSObject&gt; { Class isa OBJC_ISA_AVAILABILITY; @end ObjC是一门面向对象的语言，参考了Smalltalk的消息传递机制，那么对于开发者来说，对象、类、元类这些究竟是什么呢，他们之间的关系又是怎样的呢，这篇主要写一点对类结构的总结，偏向原理
+实例对象 #import &lt;Foundation/Foundation.h&gt;  @interface Person: NSObject @property (nonatomic, copy) NSString *name; @end @implementation Person - (void)greeting { NSLog(@&#34;Hi, I&#39;m %@&#34;, self.name); } @end int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Person *person = [[Person alloc] init]; person.name = @&#34;Alice&#34;; [person greeting]; } return 0; } 我们首先实例化一个Person对象，然后调用setter为name赋值，再调用person的实例方法greeting
+我们看一下使用clang转换之后的代码
+int main(int argc, const char * argv[]) { /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; Person *person = ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass(&#34;Person&#34;), sel_registerName(&#34;alloc&#34;)), sel_registerName(&#34;init&#34;)); ((void (*)(id, SEL, NSString *))(void *)objc_msgSend)((id)person, sel_registerName(&#34;setName:&#34;), (NSString *)&amp;__NSConstantStringImpl__var_folders_60_yqdp8_yn6vbd1tl6s3k479sr0000gp_T_main_5be332_mi_1); ((void (*)(id, SEL))(void *)objc_msgSend)((id)person, sel_registerName(&#34;greeting&#34;)); } return 0; } 代码的大体逻辑是这样的：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/posts/class/" />
+<meta property="og:image" content="http://example.org/tn.png"/>
+<meta property="article:published_time" content="2020-02-19T10:46:42+08:00" />
+<meta property="article:modified_time" content="2020-02-19T10:46:42+08:00" /><meta property="og:site_name" content="Cb7d" />
+
+
+    
+
+    
+    
+    
+    <title>
+        
+        聊聊 ObjC 的 Class
+        
+    </title>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="section" id="title">聊聊 ObjC 的 Class</div>
+
+        
+<div class="section" id="content">
+    Wed Feb 19, 2020 &#183; 510 words
+    <div class="tag-container">
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blog/">
+                blog
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/ios/">
+                iOS
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/objc/">
+                ObjC
+            </a>
+        </span>
+        
+        
+    </div>
+    <hr/>
+    <h1 id="class">Class</h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">NSObject</span> <span style="color:#f92672">&lt;</span>NSObject<span style="color:#f92672">&gt;</span> {
+<span style="color:#66d9ef">Class</span> isa  OBJC_ISA_AVAILABILITY;
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>ObjC是一门面向对象的语言，参考了Smalltalk的消息传递机制，那么对于开发者来说，对象、类、元类这些究竟是什么呢，他们之间的关系又是怎样的呢，这篇主要写一点对类结构的总结，偏向原理</p>
+<h2 id="实例对象">实例对象</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &lt;Foundation/Foundation.h&gt;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">Person</span>: <span style="color:#a6e22e">NSObject</span>
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span>, <span style="color:#66d9ef">copy</span>) NSString <span style="color:#f92672">*</span>name;
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">Person</span>
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">greeting</span> {
+    NSLog(<span style="color:#e6db74">@&#34;Hi, I&#39;m %@&#34;</span>, self.name);
+}
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">int</span> main(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#66d9ef">@autoreleasepool</span> {
+        <span style="color:#75715e">// insert code here...
+</span><span style="color:#75715e"></span>        
+        Person <span style="color:#f92672">*</span>person <span style="color:#f92672">=</span> [[Person alloc] init];
+        person.name <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;Alice&#34;</span>;
+        
+        [person greeting];
+        
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>我们首先实例化一个Person对象，然后调用setter为name赋值，再调用person的实例方法greeting</p>
+<p>我们看一下使用clang转换之后的代码</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#75715e">/* @autoreleasepool */</span> { __AtAutoreleasePool __autoreleasepool; 
+
+
+        Person <span style="color:#f92672">*</span>person <span style="color:#f92672">=</span> ((Person <span style="color:#f92672">*</span>(<span style="color:#f92672">*</span>)(id, SEL))(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>)objc_msgSend)((id)((Person <span style="color:#f92672">*</span>(<span style="color:#f92672">*</span>)(id, SEL))(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>)objc_msgSend)((id)objc_getClass(<span style="color:#e6db74">&#34;Person&#34;</span>), sel_registerName(<span style="color:#e6db74">&#34;alloc&#34;</span>)), sel_registerName(<span style="color:#e6db74">&#34;init&#34;</span>));
+        ((<span style="color:#66d9ef">void</span> (<span style="color:#f92672">*</span>)(id, SEL, NSString <span style="color:#f92672">*</span>))(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>)objc_msgSend)((id)person, sel_registerName(<span style="color:#e6db74">&#34;setName:&#34;</span>), (NSString <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>__NSConstantStringImpl__var_folders_60_yqdp8_yn6vbd1tl6s3k479sr0000gp_T_main_5be332_mi_1);
+
+        ((<span style="color:#66d9ef">void</span> (<span style="color:#f92672">*</span>)(id, SEL))(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>)objc_msgSend)((id)person, sel_registerName(<span style="color:#e6db74">&#34;greeting&#34;</span>));
+
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>代码的大体逻辑是这样的：</p>
+<ol>
+<li>使用objc_getClass获取Person的类对象</li>
+<li>向该类对象发送消息 alloc，得到返回值，也就是person对象</li>
+<li>发送init消息，初始化对象</li>
+<li>向对象发送 setName: 消息，将实例化的字符串作为参数传入</li>
+<li>向对象发送greeting消息</li>
+</ol>
+<p>这比刚才写下的代码复杂了一些，这里不对消息发送做过多介绍，有兴趣的同学看我的另一篇总结</p>
+<p>现在就需要探究一下子为啥person能够响应我们的方法了，掏出源码瞅瞅</p>
+<p>(代码有删减)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">Class <span style="color:#a6e22e">objc_getClass</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>aClassName)
+{
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>aClassName) <span style="color:#66d9ef">return</span> Nil;
+    <span style="color:#66d9ef">return</span> look_up_class(aClassName, NO, YES);
+}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">static</span> Class <span style="color:#a6e22e">getClass</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>name)
+{
+    Class result <span style="color:#f92672">=</span> getClass_impl(name);
+    <span style="color:#66d9ef">if</span> (result) <span style="color:#66d9ef">return</span> result;
+    <span style="color:#66d9ef">return</span> nil;
+}
+</code></pre></div><p>我们发现这个方法最终会返回Class类型的对象，看起来，这就是对象能够响应方法的秘密了</p>
+<h2 id="类对象">类对象</h2>
+<p>进入Class的定义，我们能够看到以下代码</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">objc_class</span> <span style="color:#f92672">*</span>Class;
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">objc_class</span> <span style="color:#f92672">:</span> objc_object {
+    <span style="color:#75715e">// Class ISA;
+</span><span style="color:#75715e"></span>    Class superclass;
+    cache_t cache;             <span style="color:#75715e">// formerly cache pointer and vtable
+</span><span style="color:#75715e"></span>    class_data_bits_t bits;    <span style="color:#75715e">// class_rw_t * plus custom rr/alloc flags
+</span><span style="color:#75715e"></span>  	<span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">isMetaClass</span>() {
+        assert(<span style="color:#66d9ef">this</span>);
+        assert(isRealized());
+        <span style="color:#66d9ef">return</span> data()<span style="color:#f92672">-&gt;</span>ro<span style="color:#f92672">-&gt;</span>flags <span style="color:#f92672">&amp;</span> RO_META;
+    }
+
+    <span style="color:#75715e">// NOT identical to this-&gt;ISA when this is a metaclass
+</span><span style="color:#75715e"></span>    Class <span style="color:#a6e22e">getMeta</span>() {
+        <span style="color:#66d9ef">if</span> (isMetaClass()) <span style="color:#66d9ef">return</span> (Class)<span style="color:#66d9ef">this</span>;
+        <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>ISA();
+    }
+    <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">isRootClass</span>() {
+        <span style="color:#66d9ef">return</span> superclass <span style="color:#f92672">==</span> nil;
+    }
+    <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">isRootMetaclass</span>() {
+        <span style="color:#66d9ef">return</span> ISA() <span style="color:#f92672">==</span> (Class)<span style="color:#66d9ef">this</span>;
+    }
+}
+</code></pre></div><p>我们发现，类居然也是对象。每个对象都有一个指针<code>Class isa</code>指向自己所属的类，这个isa就是找到对象能响应的方法列表的关键</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#f92672">-</span> (IMP)methodForSelector:(SEL)sel {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>sel) [self doesNotRecognizeSelector:sel];
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">object_getMethodImplementation</span>(self, sel);
+}
+
+IMP <span style="color:#a6e22e">object_getMethodImplementation</span>(id obj, SEL name)
+{
+    Class cls <span style="color:#f92672">=</span> (obj <span style="color:#f92672">?</span> obj<span style="color:#f92672">-&gt;</span>getIsa() <span style="color:#f92672">:</span> nil);
+    <span style="color:#66d9ef">return</span> class_getMethodImplementation(cls, name);
+}
+
+IMP <span style="color:#a6e22e">class_getMethodImplementation</span>(Class cls, SEL sel)
+{
+    IMP imp;
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>cls  <span style="color:#f92672">||</span>  <span style="color:#f92672">!</span>sel) <span style="color:#66d9ef">return</span> nil;
+
+    imp <span style="color:#f92672">=</span> lookUpImpOrNil(cls, sel, nil, 
+                         YES<span style="color:#75715e">/*initialize*/</span>, YES<span style="color:#75715e">/*cache*/</span>, YES<span style="color:#75715e">/*resolver*/</span>);
+
+    <span style="color:#75715e">// Translate forwarding function to C-callable external version
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>imp) {
+        <span style="color:#66d9ef">return</span> _objc_msgForward;
+    }
+
+    <span style="color:#66d9ef">return</span> imp;
+}
+</code></pre></div><p>这里应该可以清楚上面的代码调用过程了</p>
+<ol>
+<li>创建对象的时候根据类名获取 isa，也就是类对象</li>
+<li>在向对象发送消息的时候使用 getIsa 方法获取类对象，在类对象中查找方法的实现，</li>
+</ol>
+<p>这里就不对方法缓存做展开了</p>
+<h2 id="元类">元类</h2>
+<p>到了这里还并没有真正的了解到类结构的底部，回到最开始的初始化person的地方，我们向Person的类对象发送了alloc消息，那么这条alloc消息是如何响应的呢？</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">struct</span> objc_class : objc_object
+</code></pre></div><p>objc_class也是有isa的，类对象的isa是用来描述类的，这就是metaclass元类了</p>
+<ul>
+<li>类是对实例对象的描述</li>
+<li>元类是对类对象的描述</li>
+</ul>
+<p>所以，在向Person发送alloc消息的时候，实际上是在Person的类对象的元类中去查找方法实现，并发送消息的</p>
+<ul>
+<li>实例方法要去类对象中去找</li>
+<li>类方法要由元类去找</li>
+</ul>
+<p>那么你可能会想，元类需不需要描述呢</p>
+<p>我们可以看下NSObject.mm的实现</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">+ (<span style="color:#66d9ef">Class</span>)<span style="color:#a6e22e">class</span> {
+    <span style="color:#66d9ef">return</span> self;
+}
+
+- (<span style="color:#66d9ef">Class</span>)<span style="color:#a6e22e">class</span> {
+    <span style="color:#66d9ef">return</span> object_getClass(self);
+}
+
++ (<span style="color:#66d9ef">Class</span>)<span style="color:#a6e22e">superclass</span> {
+    <span style="color:#66d9ef">return</span> self<span style="color:#f92672">-&gt;</span>superclass;
+}
+
+- (<span style="color:#66d9ef">Class</span>)<span style="color:#a6e22e">superclass</span> {
+    <span style="color:#66d9ef">return</span> [self <span style="color:#66d9ef">class</span>]<span style="color:#f92672">-&gt;</span>superclass;
+}
+</code></pre></div><p>可以看到，NSObject是一个根类，没有父类，当你向NSObject调用class方法，返回的指针还是指向NSObject的，所以可以总结为以下几点</p>
+<ul>
+<li>根类的元类实际上是他自己</li>
+<li>子类的元类使用根类的元类作为他的类（绕口令？）</li>
+</ul>
+<p>从根类的元类开始，形成了一个环，到这里我们就对ObjC的对象、类结构清晰许多了</p>
+<h2 id="内省">内省</h2>
+<p>把上面的这些连起来，再来谈谈内省</p>
+<blockquote>
+<p>内省是对象揭示自己作为一个运行时对象的详细信息的一种能力。这些详细信息包括对象在继承树上的位置，对象是否遵循特定的协议，以及是否可以响应特定的消息。NSObject协议和类定义了很多内省方法，用于查询运行时信息，以便根据对象的特征进行识别。</p>
+</blockquote>
+<p>下面是几个内省的方法</p>
+<p>判断当前对象是否属于某个类或其父类</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#f92672">-</span> (BOOL)isKindOfClass:(Class)cls {
+    <span style="color:#66d9ef">for</span> (Class tcls <span style="color:#f92672">=</span> [self <span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010">]; </span><span style="color:#a6e22e">tcls</span>; tcls <span style="color:#f92672">=</span> tcls<span style="color:#f92672">-&gt;</span>superclass) {
+        <span style="color:#66d9ef">if</span> (tcls <span style="color:#f92672">==</span> cls) <span style="color:#66d9ef">return</span> YES;
+    }
+    <span style="color:#66d9ef">return</span> NO;
+}
+</code></pre></div><p>是否为此类的实例</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#f92672">-</span> (BOOL)isMemberOfClass:(Class)cls {
+    <span style="color:#66d9ef">return</span> [self <span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010">] == </span><span style="color:#a6e22e">cls</span>;
+}
+</code></pre></div><p>对象是否能够响应某个方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#f92672">-</span> (BOOL)respondsToSelector:(SEL)sel {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>sel) <span style="color:#66d9ef">return</span> NO;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">class_respondsToSelector_inst</span>([self <span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010">], </span><span style="color:#a6e22e">sel</span>, self);
+}
+</code></pre></div><p>对象是否遵守协议</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#f92672">-</span> (BOOL)conformsToProtocol:(Protocol <span style="color:#f92672">*</span>)protocol {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>protocol) <span style="color:#66d9ef">return</span> NO;
+    <span style="color:#66d9ef">for</span> (Class tcls <span style="color:#f92672">=</span> [self <span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010">]; </span><span style="color:#a6e22e">tcls</span>; tcls <span style="color:#f92672">=</span> tcls<span style="color:#f92672">-&gt;</span>superclass) {
+        <span style="color:#66d9ef">if</span> (class_conformsToProtocol(tcls, protocol)) <span style="color:#66d9ef">return</span> YES;
+    }
+    <span style="color:#66d9ef">return</span> NO;
+}
+</code></pre></div><h2 id="动态创建类">动态创建类</h2>
+<p>既然类也是对象，这就给了我们在运行时动态创建类的可能，看下怎么实现</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">greeting</span>(<span style="color:#66d9ef">id</span> self, <span style="color:#66d9ef">SEL</span> _cmd) {
+
+    Ivar name <span style="color:#f92672">=</span> class_getInstanceVariable([self <span style="color:#66d9ef">class</span>], <span style="color:#e6db74">&#34;name&#34;</span>);
+    NSLog(<span style="color:#e6db74">@&#34;Hi, I&#39;m %@&#34;</span>, object_getIvar(self, name));
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#66d9ef">@autoreleasepool</span> {
+        <span style="color:#75715e">// insert code here...
+</span><span style="color:#75715e"></span>        
+        <span style="color:#66d9ef">Class</span> Person <span style="color:#f92672">=</span> objc_allocateClassPair([NSObject <span style="color:#66d9ef">class</span>], <span style="color:#e6db74">&#34;Person&#34;</span>, <span style="color:#ae81ff">0</span>);
+        
+        <span style="color:#66d9ef">BOOL</span> success <span style="color:#f92672">=</span> class_addIvar(Person, <span style="color:#e6db74">&#34;name&#34;</span>, <span style="color:#66d9ef">sizeof</span>(NSString <span style="color:#f92672">*</span>), <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">@encode</span>(NSString <span style="color:#f92672">*</span>));
+        
+        objc_registerClassPair(Person);
+        
+      	<span style="color:#75715e">// TypeEncoding 
+</span><span style="color:#75715e"></span>        class_addMethod(Person, NSSelectorFromString(<span style="color:#e6db74">@&#34;greeting&#34;</span>), (<span style="color:#66d9ef">IMP</span>)greeting, <span style="color:#e6db74">&#34;v@:&#34;</span>);
+        
+        <span style="color:#66d9ef">id</span> person <span style="color:#f92672">=</span> [[Person alloc] init];
+        
+        [person setValue:<span style="color:#e6db74">@&#34;Alice&#34;</span> forKey:<span style="color:#e6db74">@&#34;name&#34;</span>];
+        
+        [person performSelector:NSSelectorFromString(<span style="color:#e6db74">@&#34;greeting&#34;</span>)];
+        
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+</code></pre></div><p>上面的TypeEncoding部分<a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html">可以参考</a></p>
+<blockquote>
+<p>Thanks</p>
+</blockquote>
+
+</div>
+
+
+        
+<div class="section bottom-menu">
+    
+<hr />
+<p>
+
+
+    
+        <a href="http://example.org/posts">back</a>
+        
+            &#183;
+        
+    
+
+    
+        
+            <a href="http://example.org/posts">posts</a>
+        
+    
+    
+        
+            &#183; 
+            <a href="http://example.org/memoryManage">memoryManage</a>
+        
+            &#183; 
+            <a href="http://example.org/portfolio">portfolio</a>
+        
+            &#183; 
+            <a href="http://example.org/about">who is Cb7d?</a>
+        
+    
+    &#183; 
+    <a href="http://example.org/">
+        main
+    </a>
+
+</p>
+</div>
+
+
+        <div class="section footer">Cb7d &lsquo;s blog.</div>
+    </div>
+</body>
+
+</html>

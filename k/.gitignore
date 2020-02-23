@@ -31,5 +31,5 @@ Carthage/Build
 fastlane/README.md
 /_book
 /node_modules
-/public
+#/public
 /resources

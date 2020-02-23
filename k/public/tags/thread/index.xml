@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>thread on Cb7d</title>
+    <link>http://example.org/tags/thread/</link>
+    <description>Recent content in thread on Cb7d</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>All rights reserved - 2020</copyright>
+    <lastBuildDate>Fri, 21 Feb 2020 10:46:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://example.org/tags/thread/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GCD (ObjC)</title>
+      <link>http://example.org/posts/gcd_objc/</link>
+      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/gcd_objc/</guid>
+      <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在ObjC中的使用，文中示例代码
+基本概念 进程 进程指在系统中能独立运行并作为资源分配的基本单位，它是由一组机器指令、数据和堆栈等组成的，是一个能独立运行的活动实体
+线程 线程是进程的基本执行单元，一个进程（程序）的所有任务都在线程中执行。
+队列 队列，又称为伫列（queue），是先进先出（FIFO, First-In-First-Out）的线性表。在具体应用中通常用链表或者数组来实现。队列只允许在后端（称为rear）进行插入操作，在前端（称为front）进行删除操作。队列的操作方式和堆栈类似，唯一的区别在于队列只允许新数据在后端进行添加。
+同步/异步 可以这么理解：
+假如你要做两件事 ， 烧水 、 刷牙
+ 同步 ：你烧水 ， 等水烧开了你再去刷牙 异步 ：你烧水 ，不等水烧开就去刷牙了 ， 水烧开了会发出声音告诉你（callback） ， 然后你再处理水烧开之后的事情  只要你是个正常人 ， 都会选择第二种 ，当然也有特殊情况 ，你喜欢用热水刷牙
+并发 指两个或多个事件在同一时间间隔内发生。可以在某条线程和其他线程之间反复多次进行上下文切换，看上去就好像一个CPU能够并且执行多个线程一样。其实是伪异步。
+线程队列中并行/串行 串行队列：串行队列的特点是队列内的线程是一个一个执行，直到结束。并行队列：并行队列的特点是队列中所有线程的执行结束时必须是一块的，队列中其他线程执行完毕后，会阻塞当前线程等待队列中其他线程执行，然后一块执行完毕。
+ 开始 下面我们就用刷牙与烧水来举例，首先clone工程，本文工程Demo
+git clone https://github.com/FelixScat/demo_GCD.git cd ObjCGCD xed ./ 打开main.m先声明两个事件
+int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  // 烧水  void (^boiledWater)(void) = ^(void){ NSLog(@&amp;#34;开始烧水：%@&amp;#34;, [NSThread currentThread]); sleep(3); NSLog(@&amp;#34;水烧好啦&amp;#34;); }; // 刷牙  void (^brushTeeth)(void) = ^(void){ NSLog(@&amp;#34;开始刷牙：%@&amp;#34;, [NSThread currentThread]); sleep(5); NSLog(@&amp;#34;牙刷完啦&amp;#34;); }; NSLog(@&amp;#34;Enter (q) to quit\n&amp;#34;); char input[100]; while (scanf(&amp;#34;%[^\n]%*c&amp;#34;, input)) { NSString *str = [NSString stringWithCString:input encoding:NSUTF8StringEncoding]; if ([str isEqualToString:@&amp;#34;q&amp;#34;]) { exit(0); } } } return 0; } 队列 先声明两个队列 // 串行队列 dispatch_queue_t serialQueue = dispatch_queue_create(&amp;#34;top.</description>
+    </item>
+    
+    <item>
+      <title>GCD (Swift)</title>
+      <link>http://example.org/posts/gcd_swift/</link>
+      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/gcd_swift/</guid>
+      <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在swift中的使用，文中示例代码
+ObjC版本
+基本概念 进程 进程指在系统中能独立运行并作为资源分配的基本单位，它是由一组机器指令、数据和堆栈等组成的，是一个能独立运行的活动实体
+线程 线程是进程的基本执行单元，一个进程（程序）的所有任务都在线程中执行。
+队列 队列，又称为伫列（queue），是先进先出（FIFO, First-In-First-Out）的线性表。在具体应用中通常用链表或者数组来实现。队列只允许在后端（称为rear）进行插入操作，在前端（称为front）进行删除操作。队列的操作方式和堆栈类似，唯一的区别在于队列只允许新数据在后端进行添加。
+同步/异步 可以这么理解：
+假如你要做两件事 ， 烧水 、 刷牙
+ 同步 ：你烧水 ， 等水烧开了你再去刷牙 异步 ：你烧水 ，不等水烧开就去刷牙了 ， 水烧开了会发出声音告诉你（callback） ， 然后你再处理水烧开之后的事情  只要你是个正常人 ， 都会选择第二种 ，当然也有特殊情况 ，你喜欢用热水刷牙
+并发 指两个或多个事件在同一时间间隔内发生。可以在某条线程和其他线程之间反复多次进行上下文切换，看上去就好像一个CPU能够并且执行多个线程一样。其实是伪异步。
+线程队列中并行/串行 串行队列：串行队列的特点是队列内的线程是一个一个执行，直到结束。并行队列：并行队列的特点是队列中所有线程的执行结束时必须是一块的，队列中其他线程执行完毕后，会阻塞当前线程等待队列中其他线程执行，然后一块执行完毕。
+ 开始 下面我们就用刷牙与烧水来举例，首先clone工程，本文工程Demo
+git clone https://github.com/FelixScat/demo_GCD.git cd swiftGCD swift package generate-xcodeproj xed ./ 打开main.swift先声明两个事件
+/// 烧水 let boiledWater = { print(&amp;#34;开始烧水: \(Thread.current)&amp;#34;) sleep(3) print(&amp;#34;水烧好啦&amp;#34;) } /// 刷牙 let brushTeeth = { print(&amp;#34;开始刷牙:\(Thread.</description>
+    </item>
+    
+    <item>
+      <title>Autoreleasepool 原理探究</title>
+      <link>http://example.org/posts/autoreleasepool/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/autoreleasepool/</guid>
+      <description>Autoreleasepool 我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
+int main(int argc, char * argv[]) { @autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); } } 首先，我们知道它是用来释放对象的，在arc下系统会为我们管理内存，那么它是如何工作的呢
+- (void)someBussiness { NSString *str = @&amp;#34;123&amp;#34;; } 我们在这里创建字符串后面打个断点，在到达断点时我们使用lldb为该变量添加观察
+(lldb) watchpoint set variable str Watchpoint created: Watchpoint 1: addr = 0x70000b5d0c58 size = 8 state = enabled type = w declare @ &amp;#39;/X/demo/ViewController.m:42&amp;#39; watchpoint spec = &amp;#39;str&amp;#39; new value: 0x000000010f9ad070 (lldb) 接着点击继续，会在后续的断点中看到
+CoreFoundation`objc_autoreleasePoolPop: -&amp;gt; 0x110d7e614 &amp;lt;+0&amp;gt;: jmpq *0x1ce4b6(%rip) ; (void *)0x0000000110295b6e: objc_autoreleasePoolPop 这里调用了pop方法，看到这里我们可以猜测这个autoreleasePool应该是个栈的结构，使用push和pop来帮助我们自动释放内存，下面从源码的角度去分析其原理</description>
+    </item>
+    
+    <item>
+      <title>iOS 中的锁🔒</title>
+      <link>http://example.org/posts/lock/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/lock/</guid>
+      <description>Lock 之前总结了atomic的安全性问题，那么在诸如此类的并发使用资源的情况下该如何保证线程安全呢，这篇主要想总结下各种锁的使用
+还使用之前电影院卖票的栗子来说明
+Theater.h
+@interface Theater : NSObject @property (nonatomic, assign) NSInteger ticketNum; @end main.m
+int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Theater *theater = [[Theater alloc] init]; // 定义总票数为2000  theater.ticketNum = 2000; // 并发队列用于卖票  dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作  for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
+    </item>
+    
+    <item>
+      <title>ObjC 中的原子性</title>
+      <link>http://example.org/posts/atomic/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/atomic/</guid>
+      <description>atomic 前言 在使用 @property 修饰成员变量的时候，会设置一个默认的缺省值 atomic
+@property (assign) NSInteger ticketNum; 以上写法等同于
+@property (atomic, assign) NSInteger ticketNum; atomic ，顾名思义是原子的，也就是说使用 atomic 修饰能够保证属性的线程安全，那么它真的做到了吗
+安全性证明 首先定义一个电影院类，向电影院添加一个总票数的属性
+#import &amp;lt;Foundation/Foundation.h&amp;gt;  NS_ASSUME_NONNULL_BEGIN @interface Theater : NSObject @property (atomic, assign) NSInteger ticketNum; @end NS_ASSUME_NONNULL_END 接下来我们模拟卖票的过程
+Theater *theater = [[Theater alloc] init]; // 定义总票数为2000 theater.ticketNum = 2000; // 并发队列用于卖票 dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作 for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
+    </item>
+    
+    <item>
+      <title>Runloop 运行循环</title>
+      <link>http://example.org/posts/runloop/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/runloop/</guid>
+      <description>RunLoop 什么是RunLoop？
+ A RunLoop object processes input for sources such as mouse and keyboard events from the window system, Port objects, and NSConnection objects. A RunLoop object also processes Timer events. Your application neither creates or explicitly manages RunLoop objects. Each Thread object—including the application’s main thread—has an RunLoop object automatically created for it as needed. If you need to access the current thread’s run loop, you do so with the class method current.</description>
+    </item>
+    
+  </channel>
+</rss>

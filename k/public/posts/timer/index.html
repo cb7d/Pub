@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="A new Hugo site.">
+<title>
+NSTimer 的一个小问题 - Cb7d
+</title>
+
+
+
+
+<link rel="shortcut icon" href="https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&amp;X-Amz-Date=20200223T024742Z&amp;X-Amz-Expires=432000&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://example.org/css/main.min.81bbafc4df93b11c1c3e2449464373c384aa4903731b4fc7a77dfcdd979e184f.css" integrity="sha256-gbuvxN&#43;TsRwcPiRJRkNzw4SqSQNzG0/Hp3383ZeeGE8=" crossorigin="anonymous" media="screen">
+
+
+
+ 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/tn.png"/>
+
+<meta name="twitter:title" content="NSTimer 的一个小问题"/>
+<meta name="twitter:description" content="Timer 的一个小问题  开发过程中我们必不可少的需要接触定时器，在iOS中，常用的定时器有以下几种：
+  GCD Timer CADisplayLink NSTimer  这里我们主要来看下 NSTimer 的一个问题
+#import &#34;ViewController.h&#34;  @interface ViewController () @property (nonatomic, strong) NSTimer *t; @end @implementation ViewController - (void)viewDidLoad { [super viewDidLoad]; } - (void)startTImer { _t = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(someBussiness) userInfo:nil repeats:true]; [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes]; } - (void)someBussiness { NSLog(@&#34;timer triggered&#34;); } - (void)dealloc { NSLog(@&#34;Controller dealloc&#34;); if (self.t) { [self.t invalidate]; } } - (void)touchesBegan:(NSSet&lt;UITouch *&gt; *)touches withEvent:(UIEvent *)event { if (self."/>
+
+<meta property="og:title" content="NSTimer 的一个小问题" />
+<meta property="og:description" content="Timer 的一个小问题  开发过程中我们必不可少的需要接触定时器，在iOS中，常用的定时器有以下几种：
+  GCD Timer CADisplayLink NSTimer  这里我们主要来看下 NSTimer 的一个问题
+#import &#34;ViewController.h&#34;  @interface ViewController () @property (nonatomic, strong) NSTimer *t; @end @implementation ViewController - (void)viewDidLoad { [super viewDidLoad]; } - (void)startTImer { _t = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(someBussiness) userInfo:nil repeats:true]; [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes]; } - (void)someBussiness { NSLog(@&#34;timer triggered&#34;); } - (void)dealloc { NSLog(@&#34;Controller dealloc&#34;); if (self.t) { [self.t invalidate]; } } - (void)touchesBegan:(NSSet&lt;UITouch *&gt; *)touches withEvent:(UIEvent *)event { if (self." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/posts/timer/" />
+<meta property="og:image" content="http://example.org/tn.png"/>
+<meta property="article:published_time" content="2020-02-19T10:46:42+08:00" />
+<meta property="article:modified_time" content="2020-02-19T10:46:42+08:00" /><meta property="og:site_name" content="Cb7d" />
+
+
+    
+
+    
+    
+    
+    <title>
+        
+        NSTimer 的一个小问题
+        
+    </title>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="section" id="title">NSTimer 的一个小问题</div>
+
+        
+<div class="section" id="content">
+    Wed Feb 19, 2020 &#183; 378 words
+    <div class="tag-container">
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blog/">
+                blog
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/ios/">
+                iOS
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/objc/">
+                ObjC
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/tips/">
+                tips
+            </a>
+        </span>
+        
+        
+    </div>
+    <hr/>
+    <h1 id="timer-的一个小问题">Timer 的一个小问题</h1>
+<blockquote>
+<p>开发过程中我们必不可少的需要接触定时器，在iOS中，常用的定时器有以下几种：</p>
+</blockquote>
+<ul>
+<li>GCD Timer</li>
+<li>CADisplayLink</li>
+<li>NSTimer</li>
+</ul>
+<p>这里我们主要来看下 <code>NSTimer</code> 的一个问题</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &#34;ViewController.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">ViewController</span> ()
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span>, <span style="color:#66d9ef">strong</span>) NSTimer <span style="color:#f92672">*</span>t;
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">ViewController</span>
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">viewDidLoad</span> {
+    [super viewDidLoad];
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">startTImer</span> {
+    
+    _t <span style="color:#f92672">=</span> [NSTimer timerWithTimeInterval:<span style="color:#ae81ff">1.0f</span> target:self selector:<span style="color:#66d9ef">@selector</span>(someBussiness) userInfo:nil repeats:true];
+    
+    [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes];
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">someBussiness</span> {
+    
+    NSLog(<span style="color:#e6db74">@&#34;timer triggered&#34;</span>);
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">dealloc</span> {
+    
+    NSLog(<span style="color:#e6db74">@&#34;Controller dealloc&#34;</span>);
+    
+    <span style="color:#66d9ef">if</span> (self.t) {
+        
+        [self.t invalidate];
+    }
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">touchesBegan:</span>(NSSet<span style="color:#f92672">&lt;</span>UITouch <span style="color:#f92672">*&gt;</span> <span style="color:#f92672">*</span>)touches <span style="color:#a6e22e">withEvent:</span>(UIEvent <span style="color:#f92672">*</span>)event {
+    <span style="color:#66d9ef">if</span> (self.presentingViewController) {
+        [self dismissViewControllerAnimated:true completion:nil];
+    }<span style="color:#66d9ef">else</span> {
+        
+        ViewController <span style="color:#f92672">*</span>vc <span style="color:#f92672">=</span> ViewController.new;
+        vc.view.backgroundColor <span style="color:#f92672">=</span> UIColor.grayColor;
+        [self presentViewController:vc animated:true completion:nil];
+        [vc startTImer];
+    }
+}
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>这里在我们点击页面之后，会present出来一个新页面，并开始使用 NSTimer 计时，并在 dealloc 中打印信息。
+再次点击present出来的viewController把当前的Controller销毁掉。</p>
+<p>再次点击我们会发现，计时器并没有停止，而且预期的dealloc中的信息也并没有打印，这是为什么呢？</p>
+<p>这里我们可以使用Xcode的 Debug Memory Graph ,就在下方控制台上面的按键里面，可以看到如图所示</p>
+<p><img src="https://github.com/FelixScat/Pub/blob/master/image/retainCircle.png?raw=true" alt="retainCircle"></p>
+<p>我们可以看到这里 Runloop 引用了 timer ，而 timer 又引用了当前的Controller，最终导致Controller无法释放</p>
+<p>我们通常会想，那把 NSTimer 的 property 用weak来修饰，或者把timer的target使用 weak 修饰不就好了吗。那我们来修改一下代码</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span>, <span style="color:#66d9ef">weak</span>) NSTimer <span style="color:#f92672">*</span>t;
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">startTImer</span> {
+    
+    <span style="color:#66d9ef">__weak</span> <span style="color:#66d9ef">typeof</span>(self) ws <span style="color:#f92672">=</span> self;
+    
+    _t <span style="color:#f92672">=</span> [NSTimer timerWithTimeInterval:<span style="color:#ae81ff">1.0f</span> target:ws selector:<span style="color:#66d9ef">@selector</span>(someBussiness) userInfo:nil repeats:true];
+    
+    [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes];
+}
+</code></pre></div><p>这里我们修改timer的property为weak，把target也修饰为weak，再次运行。</p>
+<p>哈，还是没有释放，timer 仍在打印。</p>
+<p>这里其实是因为Runloop会对加入的Timer自动强引用， 而timer会对target进行强引用，即使修饰为weak也没用，那么，有咩有什么办法来释放他呢？</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">startTImer</span> {
+    
+    <span style="color:#66d9ef">__weak</span> <span style="color:#66d9ef">typeof</span>(self) ws <span style="color:#f92672">=</span> self;
+    
+    _t <span style="color:#f92672">=</span> [NSTimer timerWithTimeInterval:<span style="color:#ae81ff">1.0f</span> repeats:true block:<span style="color:#f92672">^</span>(NSTimer <span style="color:#f92672">*</span> _Nonnull timer) {
+        
+        [ws someBussiness];
+    }];
+    
+    [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes];
+}
+</code></pre></div><p>😂 😂 😂 改为Block调用的方式就可以了，那么有没有别的方式也可以解决这个问题呢？（当然有了要不这篇我tm是在写啥）</p>
+<h3 id="nsproxy">NSProxy</h3>
+<blockquote>
+<p>An abstract superclass defining an API for objects that act as stand-ins for other objects or for objects that don’t exist yet.</p>
+</blockquote>
+<blockquote>
+<p>一个抽象超类，用于定义对象的API，这些对象充当其他对象或尚不存在的对象的替身。</p>
+</blockquote>
+<p><a href="https://developer.apple.com/documentation/foundation/nsproxy">官方文档</a></p>
+<p>使用NSProxy我们可以把任意的对象隐藏在后面，由这个抽象类在前面为我们真实的对象代理，当然，我们需要实现两个方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">forwardInvocation:</span>(NSInvocation <span style="color:#f92672">*</span>)invocation;
+
+- (NSMethodSignature <span style="color:#f92672">*</span>)<span style="color:#a6e22e">methodSignatureForSelector:</span>(<span style="color:#66d9ef">SEL</span>)sel;
+</code></pre></div><p>第一个是方法决议，我们可以在这里改变方法的指针，更换方法，
+第二个是方法签名，用来提供相应的函数返回类型和参数，</p>
+<p>接下来我们新建 TimerProxy 类 继承 NSProxy</p>
+<p>TimerProxy.h</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &lt;Foundation/Foundation.h&gt;
+</span><span style="color:#75715e"></span>
+NS_ASSUME_NONNULL_BEGIN
+
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">TimerProxy</span> : <span style="color:#a6e22e">NSProxy</span>
+
++ (<span style="color:#66d9ef">instancetype</span>)<span style="color:#a6e22e">proxyWithObject:</span>(<span style="color:#66d9ef">id</span>)obj;
+
+<span style="color:#66d9ef">@end</span>
+
+NS_ASSUME_NONNULL_END
+</code></pre></div><p>TimerProxy.m</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &#34;TimerProxy.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">TimerProxy</span> ()
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span>, <span style="color:#66d9ef">weak</span>) <span style="color:#66d9ef">id</span> object;
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">TimerProxy</span>
+
+
+- (<span style="color:#66d9ef">instancetype</span>)<span style="color:#a6e22e">withProxy:</span>(<span style="color:#66d9ef">id</span>)obj {
+    
+    _object <span style="color:#f92672">=</span> obj;
+    
+    <span style="color:#66d9ef">return</span> self;
+}
+
++ (<span style="color:#66d9ef">instancetype</span>)<span style="color:#a6e22e">proxyWithObject:</span>(<span style="color:#66d9ef">id</span>)obj {
+    
+    <span style="color:#66d9ef">return</span> [[self alloc] withProxy:obj];
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">forwardInvocation:</span>(NSInvocation <span style="color:#f92672">*</span>)invocation {
+    
+    <span style="color:#66d9ef">SEL</span> selector <span style="color:#f92672">=</span> invocation.selector;
+    
+    <span style="color:#66d9ef">if</span> ([_object respondsToSelector:selector]) {
+        
+        [invocation invokeWithTarget:_object];
+    }
+}
+
+- (NSMethodSignature <span style="color:#f92672">*</span>)<span style="color:#a6e22e">methodSignatureForSelector:</span>(<span style="color:#66d9ef">SEL</span>)sel {
+    <span style="color:#66d9ef">return</span> [_object methodSignatureForSelector:sel];
+}
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>再更新一下viewController的实现</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#75715e">#import &#34;ViewController.h&#34;
+</span><span style="color:#75715e">#import &#34;TimerProxy.h&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">@interface</span> <span style="color:#a6e22e">ViewController</span> ()
+
+<span style="color:#66d9ef">@property</span> (<span style="color:#66d9ef">nonatomic</span>, <span style="color:#66d9ef">strong</span>) NSTimer <span style="color:#f92672">*</span>t;
+
+<span style="color:#66d9ef">@end</span>
+
+<span style="color:#66d9ef">@implementation</span> <span style="color:#a6e22e">ViewController</span>
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">viewDidLoad</span> {
+    [super viewDidLoad];
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">startTImer</span> {
+    
+    _t <span style="color:#f92672">=</span> [NSTimer timerWithTimeInterval:<span style="color:#ae81ff">1.0f</span> target:[TimerProxy proxyWithObject:self] selector:<span style="color:#66d9ef">@selector</span>(someBussiness) userInfo:nil repeats:true];
+    
+    [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes];
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">someBussiness</span> {
+    
+    NSLog(<span style="color:#e6db74">@&#34;timer triggered&#34;</span>);
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">dealloc</span> {
+    
+    NSLog(<span style="color:#e6db74">@&#34;Controller dealloc&#34;</span>);
+    
+    <span style="color:#66d9ef">if</span> (self.t) {
+        
+        [self.t invalidate];
+    }
+}
+
+- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">touchesBegan:</span>(NSSet<span style="color:#f92672">&lt;</span>UITouch <span style="color:#f92672">*&gt;</span> <span style="color:#f92672">*</span>)touches <span style="color:#a6e22e">withEvent:</span>(UIEvent <span style="color:#f92672">*</span>)event {
+    <span style="color:#66d9ef">if</span> (self.presentingViewController) {
+        [self dismissViewControllerAnimated:true completion:nil];
+    }<span style="color:#66d9ef">else</span> {
+        
+        ViewController <span style="color:#f92672">*</span>vc <span style="color:#f92672">=</span> ViewController.new;
+        vc.view.backgroundColor <span style="color:#f92672">=</span> UIColor.grayColor;
+        [self presentViewController:vc animated:true completion:nil];
+        [vc startTImer];
+    }
+}
+
+<span style="color:#66d9ef">@end</span>
+</code></pre></div><p>应该可以看到正常的dealloc的输出，并且timer也停止了，
+NSProxy是一个非常有用的抽象类，当然还有其他用途，比如能够模拟多继承，后续会补充相关的整理资料。</p>
+
+</div>
+
+
+        
+<div class="section bottom-menu">
+    
+<hr />
+<p>
+
+
+    
+        <a href="http://example.org/posts">back</a>
+        
+            &#183;
+        
+    
+
+    
+        
+            <a href="http://example.org/posts">posts</a>
+        
+    
+    
+        
+            &#183; 
+            <a href="http://example.org/memoryManage">memoryManage</a>
+        
+            &#183; 
+            <a href="http://example.org/portfolio">portfolio</a>
+        
+            &#183; 
+            <a href="http://example.org/about">who is Cb7d?</a>
+        
+    
+    &#183; 
+    <a href="http://example.org/">
+        main
+    </a>
+
+</p>
+</div>
+
+
+        <div class="section footer">Cb7d &lsquo;s blog.</div>
+    </div>
+</body>
+
+</html>

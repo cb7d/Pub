@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="A new Hugo site.">
+<title>
+Autoreleasepool 原理探究 - Cb7d
+</title>
+
+
+
+
+<link rel="shortcut icon" href="https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&amp;X-Amz-Date=20200223T024742Z&amp;X-Amz-Expires=432000&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3">
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="http://example.org/css/main.min.81bbafc4df93b11c1c3e2449464373c384aa4903731b4fc7a77dfcdd979e184f.css" integrity="sha256-gbuvxN&#43;TsRwcPiRJRkNzw4SqSQNzG0/Hp3383ZeeGE8=" crossorigin="anonymous" media="screen">
+
+
+
+ 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Didact+Gothic">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://example.org/tn.png"/>
+
+<meta name="twitter:title" content="Autoreleasepool 原理探究"/>
+<meta name="twitter:description" content="Autoreleasepool 我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
+int main(int argc, char * argv[]) { @autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); } } 首先，我们知道它是用来释放对象的，在arc下系统会为我们管理内存，那么它是如何工作的呢
+- (void)someBussiness { NSString *str = @&#34;123&#34;; } 我们在这里创建字符串后面打个断点，在到达断点时我们使用lldb为该变量添加观察
+(lldb) watchpoint set variable str Watchpoint created: Watchpoint 1: addr = 0x70000b5d0c58 size = 8 state = enabled type = w declare @ &#39;/X/demo/ViewController.m:42&#39; watchpoint spec = &#39;str&#39; new value: 0x000000010f9ad070 (lldb) 接着点击继续，会在后续的断点中看到
+CoreFoundation`objc_autoreleasePoolPop: -&gt; 0x110d7e614 &lt;&#43;0&gt;: jmpq *0x1ce4b6(%rip) ; (void *)0x0000000110295b6e: objc_autoreleasePoolPop 这里调用了pop方法，看到这里我们可以猜测这个autoreleasePool应该是个栈的结构，使用push和pop来帮助我们自动释放内存，下面从源码的角度去分析其原理"/>
+
+<meta property="og:title" content="Autoreleasepool 原理探究" />
+<meta property="og:description" content="Autoreleasepool 我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
+int main(int argc, char * argv[]) { @autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); } } 首先，我们知道它是用来释放对象的，在arc下系统会为我们管理内存，那么它是如何工作的呢
+- (void)someBussiness { NSString *str = @&#34;123&#34;; } 我们在这里创建字符串后面打个断点，在到达断点时我们使用lldb为该变量添加观察
+(lldb) watchpoint set variable str Watchpoint created: Watchpoint 1: addr = 0x70000b5d0c58 size = 8 state = enabled type = w declare @ &#39;/X/demo/ViewController.m:42&#39; watchpoint spec = &#39;str&#39; new value: 0x000000010f9ad070 (lldb) 接着点击继续，会在后续的断点中看到
+CoreFoundation`objc_autoreleasePoolPop: -&gt; 0x110d7e614 &lt;&#43;0&gt;: jmpq *0x1ce4b6(%rip) ; (void *)0x0000000110295b6e: objc_autoreleasePoolPop 这里调用了pop方法，看到这里我们可以猜测这个autoreleasePool应该是个栈的结构，使用push和pop来帮助我们自动释放内存，下面从源码的角度去分析其原理" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://example.org/posts/autoreleasepool/" />
+<meta property="og:image" content="http://example.org/tn.png"/>
+<meta property="article:published_time" content="2020-02-19T10:46:42+08:00" />
+<meta property="article:modified_time" content="2020-02-19T10:46:42+08:00" /><meta property="og:site_name" content="Cb7d" />
+
+
+    
+
+    
+    
+    
+    <title>
+        
+        Autoreleasepool 原理探究
+        
+    </title>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="section" id="title">Autoreleasepool 原理探究</div>
+
+        
+<div class="section" id="content">
+    Wed Feb 19, 2020 &#183; 921 words
+    <div class="tag-container">
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/blog/">
+                blog
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/ios/">
+                iOS
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/objc/">
+                ObjC
+            </a>
+        </span>
+        
+        
+        
+        <span class="tag">
+            <a href="http://example.org/tags/thread/">
+                thread
+            </a>
+        </span>
+        
+        
+    </div>
+    <hr/>
+    <h1 id="autoreleasepool">Autoreleasepool</h1>
+<p>我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#66d9ef">@autoreleasepool</span> {
+        <span style="color:#66d9ef">return</span> UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate <span style="color:#66d9ef">class</span>]));
+    }
+}
+</code></pre></div><p>首先，我们知道它是用来释放对象的，在arc下系统会为我们管理内存，那么它是如何工作的呢</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-objectivec" data-lang="objectivec">- (<span style="color:#66d9ef">void</span>)<span style="color:#a6e22e">someBussiness</span> {
+    
+    NSString <span style="color:#f92672">*</span>str <span style="color:#f92672">=</span> <span style="color:#e6db74">@&#34;123&#34;</span>;
+    
+}
+</code></pre></div><p>我们在这里创建字符串后面打个断点，在到达断点时我们使用lldb为该变量添加观察</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#f92672">(</span>lldb<span style="color:#f92672">)</span> watchpoint set variable str
+Watchpoint created: Watchpoint 1: addr <span style="color:#f92672">=</span> 0x70000b5d0c58 size <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span> state <span style="color:#f92672">=</span> enabled type <span style="color:#f92672">=</span> w
+    declare @ <span style="color:#e6db74">&#39;/X/demo/ViewController.m:42&#39;</span>
+    watchpoint spec <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;str&#39;</span>
+    new value: 0x000000010f9ad070
+<span style="color:#f92672">(</span>lldb<span style="color:#f92672">)</span> 
+</code></pre></div><p>接着点击继续，会在后续的断点中看到</p>
+<pre><code class="language-assembly" data-lang="assembly">CoreFoundation`objc_autoreleasePoolPop:
+-&gt;  0x110d7e614 &lt;+0&gt;: jmpq   *0x1ce4b6(%rip)           ; (void *)0x0000000110295b6e: objc_autoreleasePoolPop
+</code></pre><p>这里调用了pop方法，看到这里我们可以猜测这个autoreleasePool应该是个栈的结构，使用push和pop来帮助我们自动释放内存，下面从源码的角度去分析其原理</p>
+<p>首先，我们使用clang重写main.m</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#960050;background-color:#1e0010">@</span>autoreleasepool {
+        
+        <span style="color:#66d9ef">return</span> UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate <span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010">]));</span>
+    }
+}
+</code></pre></div><p>转化后</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">clang -x objective-c -rewrite-objc -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk demo/main.m
+</code></pre></div><p>当前目录下会生成一个main.c（省略部分代码）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span> argv[]) {
+    <span style="color:#75715e">/* @autoreleasepool */</span> { __AtAutoreleasePool __autoreleasepool; 
+
+        <span style="color:#66d9ef">return</span> UIApplicationMain(argc, argv, __null, NSStringFromClass(((Class (<span style="color:#f92672">*</span>)(id, SEL))(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>)objc_msgSend)((id)objc_getClass(<span style="color:#e6db74">&#34;AppDelegate&#34;</span>), sel_registerName(<span style="color:#e6db74">&#34;class&#34;</span>))));
+    }
+}
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">struct</span> IMAGE_INFO { <span style="color:#66d9ef">unsigned</span> version; <span style="color:#66d9ef">unsigned</span> flag; } _OBJC_IMAGE_INFO <span style="color:#f92672">=</span> { <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span> };
+</code></pre></div><p>可以看到<code>@autoreleasepool</code>被转化成了这个东西<code>__AtAutoreleasePool __autoreleasepool</code>，继续搜索我们会看到这个结构体</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">__AtAutoreleasePool</span> {
+  __AtAutoreleasePool() {atautoreleasepoolobj <span style="color:#f92672">=</span> objc_autoreleasePoolPush();}
+  <span style="color:#f92672">~</span>__AtAutoreleasePool() {objc_autoreleasePoolPop(atautoreleasepoolobj);}
+  <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span> atautoreleasepoolobj;
+};
+</code></pre></div><p>可以看到，初始化的时候会调用objc_autoreleasePoolPush这个方法，析构的时候会调用objc_autoreleasePoolPop，其实就相当于在 <code>@autoreleasepool</code> 包裹的中间代码中上面插入一个push，下面插入一个pop</p>
+<p>看到这里还是不够，我们可以查看<a href="https://opensource.apple.com/tarballs/objc4/">源代码</a></p>
+<ul>
+<li>objc_autoreleasePoolPush</li>
+<li>objc_autoreleasePoolPop</li>
+</ul>
+<p>在查看源码时可以看到这个定义</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>
+<span style="color:#a6e22e">objc_autoreleasePoolPush</span>(<span style="color:#66d9ef">void</span>)
+{
+    <span style="color:#66d9ef">return</span> AutoreleasePoolPage<span style="color:#f92672">::</span>push();
+}
+
+<span style="color:#66d9ef">void</span>
+<span style="color:#a6e22e">objc_autoreleasePoolPop</span>(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>ctxt)
+{
+    AutoreleasePoolPage<span style="color:#f92672">::</span>pop(ctxt);
+}
+</code></pre></div><p>可以看到这里都是调用了 AutoreleasePoolPage 的方法</p>
+<h2 id="autoreleasepoolpage">AutoreleasePoolPage</h2>
+<p>这里我们先看下Page的大致结构如下</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AutoreleasePoolPage</span> 
+{
+  	<span style="color:#75715e">// 用来校验page的完整性
+</span><span style="color:#75715e"></span>    magic_t <span style="color:#66d9ef">const</span> magic;
+    id <span style="color:#f92672">*</span>next;
+  	<span style="color:#75715e">// 保存当前线程
+</span><span style="color:#75715e"></span>    pthread_t <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">thread</span>;
+  	<span style="color:#75715e">// 指向上一页的指针
+</span><span style="color:#75715e"></span>    AutoreleasePoolPage <span style="color:#f92672">*</span> <span style="color:#66d9ef">const</span> parent;
+  	<span style="color:#75715e">// 指向下一页的指针
+</span><span style="color:#75715e"></span>    AutoreleasePoolPage <span style="color:#f92672">*</span>child;
+  	<span style="color:#75715e">// 深度
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint32_t</span> <span style="color:#66d9ef">const</span> depth;
+    <span style="color:#66d9ef">uint32_t</span> hiwat;
+}
+</code></pre></div><p>可以看出，自动释放池的结构是一个双向链表</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">#define I386_PGBYTES            4096            </span><span style="color:#75715e">/* bytes per 80386 page */</span><span style="color:#75715e">
+</span><span style="color:#75715e">#define PAGE_SIZE               I386_PGBYTES
+</span></code></pre></div><p>每页占用的最大内存为 4096 字节</p>
+<h2 id="objc_autoreleasepoolpush">objc_autoreleasePoolPush</h2>
+<p>看完大致结构继续查看push操作</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">push</span>() 
+{
+  id <span style="color:#f92672">*</span>dest;
+  dest <span style="color:#f92672">=</span> autoreleaseFast(POOL_BOUNDARY);
+  assert(dest <span style="color:#f92672">==</span> EMPTY_POOL_PLACEHOLDER <span style="color:#f92672">||</span> <span style="color:#f92672">*</span>dest <span style="color:#f92672">==</span> POOL_BOUNDARY);
+  <span style="color:#66d9ef">return</span> dest;
+}
+</code></pre></div><p>又会进入以下方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">inline</span> id <span style="color:#f92672">*</span><span style="color:#a6e22e">autoreleaseFast</span>(id obj)
+{
+  <span style="color:#75715e">// 获取hotPage
+</span><span style="color:#75715e"></span>  AutoreleasePoolPage <span style="color:#f92672">*</span>page <span style="color:#f92672">=</span> hotPage();
+  <span style="color:#75715e">// 获取到page并且page没有满
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (page <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span>page<span style="color:#f92672">-&gt;</span>full()) {
+    <span style="color:#75715e">// page直接添加新对象
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> page<span style="color:#f92672">-&gt;</span>add(obj);
+  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (page) {
+    <span style="color:#75715e">// page满了
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> autoreleaseFullPage(obj, page);
+  } <span style="color:#66d9ef">else</span> {
+    <span style="color:#75715e">// 没有获取到page
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> autoreleaseNoPage(obj);
+  }
+}
+</code></pre></div><p>下面就会分成三种情况</p>
+<p>获取到hotPage且没有满</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">id <span style="color:#f92672">*</span><span style="color:#a6e22e">add</span>(id obj)
+{
+  assert(<span style="color:#f92672">!</span>full());
+  unprotect();
+  <span style="color:#75715e">// 压栈
+</span><span style="color:#75715e"></span>  id <span style="color:#f92672">*</span>ret <span style="color:#f92672">=</span> next;  <span style="color:#75715e">// faster than `return next-1` because of aliasing
+</span><span style="color:#75715e"></span>  <span style="color:#f92672">*</span>next<span style="color:#f92672">++</span> <span style="color:#f92672">=</span> obj;
+  protect();
+  <span style="color:#66d9ef">return</span> ret;
+}
+</code></pre></div><p>hotPage已经满员</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">id <span style="color:#f92672">*</span><span style="color:#a6e22e">autoreleaseFullPage</span>(id obj, AutoreleasePoolPage <span style="color:#f92672">*</span>page)
+{
+  assert(page <span style="color:#f92672">==</span> hotPage());
+  assert(page<span style="color:#f92672">-&gt;</span>full()  <span style="color:#f92672">||</span>  DebugPoolAllocation);
+	<span style="color:#75715e">// 顺着链表向下查找是否有未满的page，没有则创建新的page
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">do</span> {
+    <span style="color:#66d9ef">if</span> (page<span style="color:#f92672">-&gt;</span>child) page <span style="color:#f92672">=</span> page<span style="color:#f92672">-&gt;</span>child;
+    <span style="color:#66d9ef">else</span> page <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AutoreleasePoolPage(page);
+  } <span style="color:#66d9ef">while</span> (page<span style="color:#f92672">-&gt;</span>full());
+
+  setHotPage(page);
+  <span style="color:#66d9ef">return</span> page<span style="color:#f92672">-&gt;</span>add(obj);
+}
+</code></pre></div><p>未获取到hotPage</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">id <span style="color:#f92672">*</span><span style="color:#a6e22e">autoreleaseNoPage</span>(id obj)
+{
+  <span style="color:#75715e">// 进入此方法有两种可能，一是自动释放池没有执行push操作，二是自动释放池为空
+</span><span style="color:#75715e"></span>  assert(<span style="color:#f92672">!</span>hotPage());
+
+  <span style="color:#66d9ef">bool</span> pushExtraBoundary <span style="color:#f92672">=</span> false;
+  <span style="color:#66d9ef">if</span> (haveEmptyPoolPlaceholder()) {
+    <span style="color:#75715e">// We are pushing a second pool over the empty placeholder pool
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// or pushing the first object into the empty placeholder pool.
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Before doing that, push a pool boundary on behalf of the pool 
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// that is currently represented by the empty placeholder.
+</span><span style="color:#75715e"></span>    pushExtraBoundary <span style="color:#f92672">=</span> true;
+  }
+  <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (obj <span style="color:#f92672">!=</span> POOL_BOUNDARY  <span style="color:#f92672">&amp;&amp;</span>  DebugMissingPools) {
+    <span style="color:#75715e">// We are pushing an object with no pool in place, 
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// and no-pool debugging was requested by environment.
+</span><span style="color:#75715e"></span>    _objc_inform(<span style="color:#e6db74">&#34;MISSING POOLS: (%p) Object %p of class %s &#34;</span>
+                 <span style="color:#e6db74">&#34;autoreleased with no pool in place - &#34;</span>
+                 <span style="color:#e6db74">&#34;just leaking - break on &#34;</span>
+                 <span style="color:#e6db74">&#34;objc_autoreleaseNoPool() to debug&#34;</span>, 
+                 pthread_self(), (<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)obj, object_getClassName(obj));
+    objc_autoreleaseNoPool(obj);
+    <span style="color:#66d9ef">return</span> nil;
+  }
+  <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (obj <span style="color:#f92672">==</span> POOL_BOUNDARY  <span style="color:#f92672">&amp;&amp;</span>  <span style="color:#f92672">!</span>DebugPoolAllocation) {
+    <span style="color:#75715e">// We are pushing a pool with no pool in place,
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// and alloc-per-pool debugging was not requested.
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Install and return the empty pool placeholder.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> setEmptyPoolPlaceholder();
+  }
+
+  <span style="color:#75715e">// We are pushing an object or a non-placeholder&#39;d pool.
+</span><span style="color:#75715e"></span>
+  <span style="color:#75715e">// 初始化新的一页并设诶hotPage
+</span><span style="color:#75715e"></span>  AutoreleasePoolPage <span style="color:#f92672">*</span>page <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AutoreleasePoolPage(nil);
+  setHotPage(page);
+
+  <span style="color:#75715e">// Push a boundary on behalf of the previously-placeholder&#39;d pool.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (pushExtraBoundary) {
+    page<span style="color:#f92672">-&gt;</span>add(POOL_BOUNDARY);
+  }
+
+  <span style="color:#75715e">// Push the requested object or pool.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> page<span style="color:#f92672">-&gt;</span>add(obj);
+}
+</code></pre></div><h2 id="objc_autoreleasepoolpop">objc_autoreleasePoolPop</h2>
+<p>下面我们回过头看看pop方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">pop</span>(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>token) 
+{
+  AutoreleasePoolPage <span style="color:#f92672">*</span>page;
+  id <span style="color:#f92672">*</span>stop;
+	
+  <span style="color:#75715e">// 清理 placeholder pool
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (token <span style="color:#f92672">==</span> (<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)EMPTY_POOL_PLACEHOLDER) {
+    <span style="color:#66d9ef">if</span> (hotPage()) {
+      pop(coldPage()<span style="color:#f92672">-&gt;</span>begin());
+    } <span style="color:#66d9ef">else</span> {
+      setHotPage(nil);
+    }
+    <span style="color:#66d9ef">return</span>;
+  }
+	<span style="color:#75715e">// 获取当前传入token所在的page
+</span><span style="color:#75715e"></span>  page <span style="color:#f92672">=</span> pageForPointer(token);
+  stop <span style="color:#f92672">=</span> (id <span style="color:#f92672">*</span>)token;
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">*</span>stop <span style="color:#f92672">!=</span> POOL_BOUNDARY) {
+    <span style="color:#66d9ef">if</span> (stop <span style="color:#f92672">==</span> page<span style="color:#f92672">-&gt;</span>begin()  <span style="color:#f92672">&amp;&amp;</span>  <span style="color:#f92672">!</span>page<span style="color:#f92672">-&gt;</span>parent) {
+      <span style="color:#75715e">// Start of coldest page may correctly not be POOL_BOUNDARY:
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">// 1. top-level pool is popped, leaving the cold page in place
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">// 2. an object is autoreleased with no pool
+</span><span style="color:#75715e"></span>    } <span style="color:#66d9ef">else</span> {
+      <span style="color:#75715e">// Error. For bincompat purposes this is not 
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">// fatal in executables built with old SDKs.
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">return</span> badPop(token);
+    }
+  }
+
+  <span style="color:#66d9ef">if</span> (PrintPoolHiwat) printHiwat();
+
+  <span style="color:#75715e">// 循环next清理内容，直到stop
+</span><span style="color:#75715e"></span>  page<span style="color:#f92672">-&gt;</span>releaseUntil(stop);
+
+  <span style="color:#75715e">// 清理空的链表下级
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (DebugPoolAllocation  <span style="color:#f92672">&amp;&amp;</span>  page<span style="color:#f92672">-&gt;</span>empty()) {
+    <span style="color:#75715e">// special case: delete everything during page-per-pool debugging
+</span><span style="color:#75715e"></span>    AutoreleasePoolPage <span style="color:#f92672">*</span>parent <span style="color:#f92672">=</span> page<span style="color:#f92672">-&gt;</span>parent;
+    page<span style="color:#f92672">-&gt;</span>kill();
+    setHotPage(parent);
+  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (DebugMissingPools  <span style="color:#f92672">&amp;&amp;</span>  page<span style="color:#f92672">-&gt;</span>empty()  <span style="color:#f92672">&amp;&amp;</span>  <span style="color:#f92672">!</span>page<span style="color:#f92672">-&gt;</span>parent) {
+    <span style="color:#75715e">// special case: delete everything for pop(top) 
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// when debugging missing autorelease pools
+</span><span style="color:#75715e"></span>    page<span style="color:#f92672">-&gt;</span>kill();
+    setHotPage(nil);
+  } 
+  <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (page<span style="color:#f92672">-&gt;</span>child) {
+    <span style="color:#75715e">// hysteresis: keep one empty child if page is more than half full
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (page<span style="color:#f92672">-&gt;</span>lessThanHalfFull()) {
+      page<span style="color:#f92672">-&gt;</span>child<span style="color:#f92672">-&gt;</span>kill();
+    }
+    <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (page<span style="color:#f92672">-&gt;</span>child<span style="color:#f92672">-&gt;</span>child) {
+      page<span style="color:#f92672">-&gt;</span>child<span style="color:#f92672">-&gt;</span>child<span style="color:#f92672">-&gt;</span>kill();
+    }
+  }
+}
+</code></pre></div><p>其中 releaseUntil 方法是这样的</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">releaseUntil</span>(id <span style="color:#f92672">*</span>stop) 
+{
+  <span style="color:#75715e">// Not recursive: we don&#39;t want to blow out the stack 
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// if a thread accumulates a stupendous amount of garbage
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">while</span> (<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>next <span style="color:#f92672">!=</span> stop) {
+    <span style="color:#75715e">// Restart from hotPage() every time, in case -release 
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// autoreleased more objects
+</span><span style="color:#75715e"></span>    AutoreleasePoolPage <span style="color:#f92672">*</span>page <span style="color:#f92672">=</span> hotPage();
+
+    <span style="color:#75715e">// fixme I think this `while` can be `if`, but I can&#39;t prove it
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (page<span style="color:#f92672">-&gt;</span>empty()) {
+      page <span style="color:#f92672">=</span> page<span style="color:#f92672">-&gt;</span>parent;
+      setHotPage(page);
+    }
+
+    page<span style="color:#f92672">-&gt;</span>unprotect();
+    id obj <span style="color:#f92672">=</span> <span style="color:#f92672">*--</span>page<span style="color:#f92672">-&gt;</span>next;
+    memset((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)page<span style="color:#f92672">-&gt;</span>next, SCRIBBLE, <span style="color:#66d9ef">sizeof</span>(<span style="color:#f92672">*</span>page<span style="color:#f92672">-&gt;</span>next));
+    page<span style="color:#f92672">-&gt;</span>protect();
+
+    <span style="color:#66d9ef">if</span> (obj <span style="color:#f92672">!=</span> POOL_BOUNDARY) {
+      <span style="color:#75715e">// release page 中的对象
+</span><span style="color:#75715e"></span>      objc_release(obj);
+    }
+  }
+
+  setHotPage(<span style="color:#66d9ef">this</span>);
+
+  <span style="color:#75715e">#if DEBUG
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// we expect any children to be completely empty
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">for</span> (AutoreleasePoolPage <span style="color:#f92672">*</span>page <span style="color:#f92672">=</span> child; page; page <span style="color:#f92672">=</span> page<span style="color:#f92672">-&gt;</span>child) {
+    assert(page<span style="color:#f92672">-&gt;</span>empty());
+  }
+  <span style="color:#75715e">#endif
+</span><span style="color:#75715e"></span>}
+
+</code></pre></div><p>那么，对象是如何加入自动释放池的呢</p>
+<p>对象在发送autorelease的时候</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#f92672">-</span> (id)autorelease {
+    <span style="color:#66d9ef">return</span> ((id)self)<span style="color:#f92672">-&gt;</span>rootAutorelease();
+}
+</code></pre></div><p>最终会调用到这个方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">inline</span> id <span style="color:#f92672">*</span><span style="color:#a6e22e">autoreleaseFast</span>(id obj)
+{
+  AutoreleasePoolPage <span style="color:#f92672">*</span>page <span style="color:#f92672">=</span> hotPage();
+  <span style="color:#66d9ef">if</span> (page <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span>page<span style="color:#f92672">-&gt;</span>full()) {
+    <span style="color:#66d9ef">return</span> page<span style="color:#f92672">-&gt;</span>add(obj);
+  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (page) {
+    <span style="color:#66d9ef">return</span> autoreleaseFullPage(obj, page);
+  } <span style="color:#66d9ef">else</span> {
+    <span style="color:#66d9ef">return</span> autoreleaseNoPage(obj);
+  }
+}
+</code></pre></div><p>到了这里，关于自动释放池我们已经知道了大概运行的原理，总结一下</p>
+<p>在使用@autoreleasepool的时候：</p>
+<ol>
+<li>调用 objc_autoreleasePoolPush 创建新page</li>
+<li>对象通过发送 autorelease 消息加入自动释放池</li>
+<li>自动释放池context结束调用objc_autoreleasePoolPop，向pool中对象发送release消息</li>
+</ol>
+<h2 id="参考">参考</h2>
+<p><a href="https://draveness.me/autoreleasepool">https://draveness.me/autoreleasepool</a></p>
+<p><a href="https://opensource.apple.com/tarballs/objc4/">https://opensource.apple.com/tarballs/objc4/</a></p>
+<p><a href="https://juejin.im/post/5a687e356fb9a01c94060620">https://juejin.im/post/5a687e356fb9a01c94060620</a></p>
+
+</div>
+
+
+        
+<div class="section bottom-menu">
+    
+<hr />
+<p>
+
+
+    
+        <a href="http://example.org/posts">back</a>
+        
+            &#183;
+        
+    
+
+    
+        
+            <a href="http://example.org/posts">posts</a>
+        
+    
+    
+        
+            &#183; 
+            <a href="http://example.org/memoryManage">memoryManage</a>
+        
+            &#183; 
+            <a href="http://example.org/portfolio">portfolio</a>
+        
+            &#183; 
+            <a href="http://example.org/about">who is Cb7d?</a>
+        
+    
+    &#183; 
+    <a href="http://example.org/">
+        main
+    </a>
+
+</p>
+</div>
+
+
+        <div class="section footer">Cb7d &lsquo;s blog.</div>
+    </div>
+</body>
+
+</html>

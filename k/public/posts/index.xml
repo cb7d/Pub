@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Cb7d</title>
+    <link>http://example.org/posts/</link>
+    <description>Recent content in Posts on Cb7d</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>All rights reserved - 2020</copyright>
+    <lastBuildDate>Fri, 21 Feb 2020 10:46:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://example.org/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GCD (ObjC)</title>
+      <link>http://example.org/posts/gcd_objc/</link>
+      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/gcd_objc/</guid>
+      <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在ObjC中的使用，文中示例代码
+基本概念 进程 进程指在系统中能独立运行并作为资源分配的基本单位，它是由一组机器指令、数据和堆栈等组成的，是一个能独立运行的活动实体
+线程 线程是进程的基本执行单元，一个进程（程序）的所有任务都在线程中执行。
+队列 队列，又称为伫列（queue），是先进先出（FIFO, First-In-First-Out）的线性表。在具体应用中通常用链表或者数组来实现。队列只允许在后端（称为rear）进行插入操作，在前端（称为front）进行删除操作。队列的操作方式和堆栈类似，唯一的区别在于队列只允许新数据在后端进行添加。
+同步/异步 可以这么理解：
+假如你要做两件事 ， 烧水 、 刷牙
+ 同步 ：你烧水 ， 等水烧开了你再去刷牙 异步 ：你烧水 ，不等水烧开就去刷牙了 ， 水烧开了会发出声音告诉你（callback） ， 然后你再处理水烧开之后的事情  只要你是个正常人 ， 都会选择第二种 ，当然也有特殊情况 ，你喜欢用热水刷牙
+并发 指两个或多个事件在同一时间间隔内发生。可以在某条线程和其他线程之间反复多次进行上下文切换，看上去就好像一个CPU能够并且执行多个线程一样。其实是伪异步。
+线程队列中并行/串行 串行队列：串行队列的特点是队列内的线程是一个一个执行，直到结束。并行队列：并行队列的特点是队列中所有线程的执行结束时必须是一块的，队列中其他线程执行完毕后，会阻塞当前线程等待队列中其他线程执行，然后一块执行完毕。
+ 开始 下面我们就用刷牙与烧水来举例，首先clone工程，本文工程Demo
+git clone https://github.com/FelixScat/demo_GCD.git cd ObjCGCD xed ./ 打开main.m先声明两个事件
+int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  // 烧水  void (^boiledWater)(void) = ^(void){ NSLog(@&amp;#34;开始烧水：%@&amp;#34;, [NSThread currentThread]); sleep(3); NSLog(@&amp;#34;水烧好啦&amp;#34;); }; // 刷牙  void (^brushTeeth)(void) = ^(void){ NSLog(@&amp;#34;开始刷牙：%@&amp;#34;, [NSThread currentThread]); sleep(5); NSLog(@&amp;#34;牙刷完啦&amp;#34;); }; NSLog(@&amp;#34;Enter (q) to quit\n&amp;#34;); char input[100]; while (scanf(&amp;#34;%[^\n]%*c&amp;#34;, input)) { NSString *str = [NSString stringWithCString:input encoding:NSUTF8StringEncoding]; if ([str isEqualToString:@&amp;#34;q&amp;#34;]) { exit(0); } } } return 0; } 队列 先声明两个队列 // 串行队列 dispatch_queue_t serialQueue = dispatch_queue_create(&amp;#34;top.</description>
+    </item>
+    
+    <item>
+      <title>GCD (Swift)</title>
+      <link>http://example.org/posts/gcd_swift/</link>
+      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/gcd_swift/</guid>
+      <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在swift中的使用，文中示例代码
+ObjC版本
+基本概念 进程 进程指在系统中能独立运行并作为资源分配的基本单位，它是由一组机器指令、数据和堆栈等组成的，是一个能独立运行的活动实体
+线程 线程是进程的基本执行单元，一个进程（程序）的所有任务都在线程中执行。
+队列 队列，又称为伫列（queue），是先进先出（FIFO, First-In-First-Out）的线性表。在具体应用中通常用链表或者数组来实现。队列只允许在后端（称为rear）进行插入操作，在前端（称为front）进行删除操作。队列的操作方式和堆栈类似，唯一的区别在于队列只允许新数据在后端进行添加。
+同步/异步 可以这么理解：
+假如你要做两件事 ， 烧水 、 刷牙
+ 同步 ：你烧水 ， 等水烧开了你再去刷牙 异步 ：你烧水 ，不等水烧开就去刷牙了 ， 水烧开了会发出声音告诉你（callback） ， 然后你再处理水烧开之后的事情  只要你是个正常人 ， 都会选择第二种 ，当然也有特殊情况 ，你喜欢用热水刷牙
+并发 指两个或多个事件在同一时间间隔内发生。可以在某条线程和其他线程之间反复多次进行上下文切换，看上去就好像一个CPU能够并且执行多个线程一样。其实是伪异步。
+线程队列中并行/串行 串行队列：串行队列的特点是队列内的线程是一个一个执行，直到结束。并行队列：并行队列的特点是队列中所有线程的执行结束时必须是一块的，队列中其他线程执行完毕后，会阻塞当前线程等待队列中其他线程执行，然后一块执行完毕。
+ 开始 下面我们就用刷牙与烧水来举例，首先clone工程，本文工程Demo
+git clone https://github.com/FelixScat/demo_GCD.git cd swiftGCD swift package generate-xcodeproj xed ./ 打开main.swift先声明两个事件
+/// 烧水 let boiledWater = { print(&amp;#34;开始烧水: \(Thread.current)&amp;#34;) sleep(3) print(&amp;#34;水烧好啦&amp;#34;) } /// 刷牙 let brushTeeth = { print(&amp;#34;开始刷牙:\(Thread.</description>
+    </item>
+    
+    <item>
+      <title>AFNetworking 你真的了解吗</title>
+      <link>http://example.org/posts/afnetworking/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/afnetworking/</guid>
+      <description>AFN . ├── AFCompatibilityMacros.h ├── AFHTTPSessionManager.h ├── AFHTTPSessionManager.m ├── AFNetworkReachabilityManager.h ├── AFNetworkReachabilityManager.m ├── AFNetworking.h ├── AFSecurityPolicy.h ├── AFSecurityPolicy.m ├── AFURLRequestSerialization.h ├── AFURLRequestSerialization.m ├── AFURLResponseSerialization.h ├── AFURLResponseSerialization.m ├── AFURLSessionManager.h └── AFURLSessionManager.m Why AFN 大多项目中我们都会使用网络请求去和服务端进行交互，而对于iOS开发者而言，最广为人知的网络请求框架莫过于 AFNetworking 了，那么大家有没有想过为什么广大的开发者选择了它，它对比iOS原生的网络请求有什么区别呢，下面我会总结下自己对于 AFN 的看法和体会，也希望能对一样学习的小伙伴提供一些帮助
+AFN 解析 基本使用 GET
+- (void)sendRequest { AFHTTPSessionManager *manager = [AFHTTPSessionManager manager]; NSURLSessionDataTask *task = [manager GET:@&amp;#34;http://httpbin.org/get&amp;#34; parameters:@{@&amp;#34;arg1&amp;#34;:@(100), @&amp;#34;arg2&amp;#34;: @{@&amp;#34;foo&amp;#34;:@&amp;#34;bar&amp;#34;}} progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) { } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) { }]; } POST</description>
+    </item>
+    
+    <item>
+      <title>Aspects 面向切面编程</title>
+      <link>http://example.org/posts/aspects/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/aspects/</guid>
+      <description>Aspects 本文示例工程
+什么是AOP？
+面向切面的程序设计（Aspect-oriented programming，AOP，又译作面向方面的程序设计、剖面导向程序设计）是计算机科学中的一种程序设计思想，旨在将横切关注点与业务主体进行进一步分离，以提高程序代码的模块化程度。通过在现有代码基础上增加额外的通知（Advice）机制，能够对被声明为“切点（Pointcut）”的代码块进行统一管理与装饰，如“对所有方法名以‘set*’开头的方法添加后台日志”。该思想使得开发人员能够将与代码核心业务逻辑关系不那么密切的功能（如日志功能）添加至程序中，同时又不降低业务代码的可读性。面向切面的程序设计思想也是面向切面软件开发的基础。
+在开发过程中我们总会遇到某种需求，需要对我们业务内部的所有状态进行统一管理，比如对点击事件，用户进入的页面等进行埋点处理，对于这种需求我们一般会想到利用 Runtime 的消息转发功能实现这种需求，对这块不熟悉的同学可以看这篇，下面我们来看下 Aspects 是如何设计的
+使用方式 先看下接口里面的方法
+@interface NSObject (Aspects) /// Adds a block of code before/instead/after the current `selector` for a specific class. /// /// @param block Aspects replicates the type signature of the method being hooked. /// The first parameter will be `id&amp;lt;AspectInfo&amp;gt;`, followed by all parameters of the method. /// These parameters are optional and will be filled to match the block signature.</description>
+    </item>
+    
+    <item>
+      <title>Autoreleasepool 原理探究</title>
+      <link>http://example.org/posts/autoreleasepool/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/autoreleasepool/</guid>
+      <description>Autoreleasepool 我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
+int main(int argc, char * argv[]) { @autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); } } 首先，我们知道它是用来释放对象的，在arc下系统会为我们管理内存，那么它是如何工作的呢
+- (void)someBussiness { NSString *str = @&amp;#34;123&amp;#34;; } 我们在这里创建字符串后面打个断点，在到达断点时我们使用lldb为该变量添加观察
+(lldb) watchpoint set variable str Watchpoint created: Watchpoint 1: addr = 0x70000b5d0c58 size = 8 state = enabled type = w declare @ &amp;#39;/X/demo/ViewController.m:42&amp;#39; watchpoint spec = &amp;#39;str&amp;#39; new value: 0x000000010f9ad070 (lldb) 接着点击继续，会在后续的断点中看到
+CoreFoundation`objc_autoreleasePoolPop: -&amp;gt; 0x110d7e614 &amp;lt;+0&amp;gt;: jmpq *0x1ce4b6(%rip) ; (void *)0x0000000110295b6e: objc_autoreleasePoolPop 这里调用了pop方法，看到这里我们可以猜测这个autoreleasePool应该是个栈的结构，使用push和pop来帮助我们自动释放内存，下面从源码的角度去分析其原理</description>
+    </item>
+    
+    <item>
+      <title>Clang简单上手</title>
+      <link>http://example.org/posts/clang/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/clang/</guid>
+      <description>Clang 作为一个iOS工程师，每次看到Xcode在进行漫长的编译的时候总是忍不住想深究一下自己手写的BUG是如何被生成的，所以下定决定研究一下我们的编译器
+要探究首先要知道我们使用的是LLVM编译器
+LLVM（Low Level Virtual Machine）  LLVM是一个自由软件项目，它是一种编译器基础设施，以C++写成，包含一系列模块化的编译器组件和工具链，用来开发编译器前端和后端。它是为了任意一种编程语言而写成的程序，利用虚拟技术创造出编译时期、链接时期、运行时期以及“闲置时期”的最优化。它最早以C/C++为实现对象，而当前它已支持包括ActionScript、Ada、D语言、Fortran、GLSL、Haskell、Java字节码、Objective-C、Swift、Python、Ruby、Rust、Scala以及C#等语言。
+ 以上摘自维基百科
+几种编译器简介 目前市面上常见的编译器有以下两种
+ GCC（GNU Compiler Collection） LLVM  LLVM 我们上面已经稍微介绍过了，下面引用维基百科对GCC的定义
+ GNU编译器套装（英语：GNU Compiler Collection，缩写为GCC），指一套编程语言编译器，以GPL及LGPL许可证所发行的自由软件，也是GNU项目的关键部分，也是GNU工具链的主要组成部分之一。GCC（特别是其中的C语言编译器）也常被认为是跨平台编译器的事实标准。1985年由理查德·马修·斯托曼开始发展，现在由自由软件基金会负责维护工作。 原名为GNU C语言编译器（GNU C Compiler），因为它原本只能处理C语言。GCC在发布后很快地得到扩展，变得可处理C++。之后也变得可处理Fortran、Pascal、Objective-C、Java、Ada，Go与其他语言。 许多操作系统，包括许多类Unix系统，如Linux及BSD家族都采用GCC作为标准编译器。
+ LLVM与GCC 我们现在所使用的Xcode采用的是LLVM，以前曾经使用过GCC，见下表
+   Xcode 版本 应用编译器     &amp;lt; Xcode3 GCC   Xcode3 GCC + LLVM   Xcode4.2 默认LLVM-Clang   &amp;gt; Xcode5 废弃GCC    那么，同样是编译器，为何Xcode最终选择LLVM而舍弃Clang呢
+ Apple对Objective-C新增的特性，GCC并未配合给予实现 GCC编译器前后端代码耦合度过高 license GCC限制了LLVM-GCC的开发  LLVM 设计思想 以下是传统的三相设计思想</description>
+    </item>
+    
+    <item>
+      <title>cocoapods</title>
+      <link>http://example.org/posts/cocoapods/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/cocoapods/</guid>
+      <description>CocoaPods CocoaPods是OS X和iOS下的一个第三类库管理工具，通过CocoaPods工具我们可以为项目添加被称为“Pods”的依赖库（这些类库必须是CocoaPods本身所支持的），并且可以轻松管理其版本。
+使用CocoaPods有以下几点好处：
+ 在引入第三方库时它可以自动为我们完成各种各样的配置，包括配置编译阶段、连接器选项、甚至是ARC环境下的一些配置等。 使用CocoaPods可以很方便地管理的第三方SDK，大部分稳定好用的SDK都支持cocoapods导入。 在项目模块化的过程中方便我们模块间解耦。  安装 sudo gem install cocoapods 查看版本 pod --version 在开发中安装使用cocoapods要注意版本,因为一般开发过程中要大家一起使用同一个工程,一般为了指定版本我们会在工程下创建Gemfile来指定使用cocoapods的版本。
+指定使用Cocoapods的版本 除了指定Gemfile以外 ， 我们还可以安装指定版本的pods
+sudo gem install cocoapods -v 1.3.1 再查看一下pod版本我们就会发现已经安装了1.3.1
+卸载掉不需要的版本 当我们本地同时存在多个版本的pod的时候可以把多余的卸载掉
+sudo gem uninstall cocoapods 会提示我们选择卸载的版本
+Select gem to uninstall: 1. cocoapods-1.2.1 2. cocoapods-1.3.1 3. All versions &amp;gt; 我们选择想要卸载的版本的序号就好了 。
+使用rvm管理ruby环境 有时我们需要不同的ruby环境，而且不想更改系统自带的时候可以考虑使用rvm管理本地的ruby版本
+\curl -sSL https://get.rvm.io | bash -s stable 查看可用的ruby版本
+rvm list known 使用某个制定版本作为默认的ruby版本
+rvm use 2.6.3 --default 安装和使用bundle gem install bundler 然后在工程目录下创建Gemfile</description>
+    </item>
+    
+    <item>
+      <title>HTTPS</title>
+      <link>http://example.org/posts/https/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/https/</guid>
+      <description>HTTPS 最近又看了一遍 [HTTP权威指南]，每次想写个总结的时候都会拖延症爆发，今天决定简单总结下我们日常使用的的网络传输协议和TLS相关。
+OSI (Open System Interconnect) 先列一张能够体现不同协议在OSI七层模型中的表格
+   层级 层级名称 应用     7 应用层 例如HTTP、SMTP、SNMP、FTP、Telnet、SIP、SSH、NFS、RTSP、XMPP、Whois、ENRP、TLS   6 表示层 例如XDR、ASN.1、SMB、AFP、NCP   5 会话层 例如ASAP、ISO 8327 / CCITT X.225、RPC、NetBIOS、ASP、IGMP、Winsock、BSD sockets   4 传输层 例如TCP、UDP、RTP、SCTP、SPX、ATP、IL   3 网络层 例如IP、ICMP、IPX、BGP、OSPF、RIP、IGRP、EIGRP、ARP、RARP、X.25   2 数据链路层 例如以太网、令牌环、HDLC、帧中继、ISDN、ATM、IEEE 802.11、FDDI、PPP   1 物理层 例如线路、无线电、光纤    先从 TCP/IP 说起  IPS（Internet Protocol Suite）又叫做互联网协议套件、是一套网络传输协议家族，也就是我们熟悉的TCP/IP协议族，（又因为TCP、IP为不同层级的协议，当多个层级的协议共同工作时类似计算机科学中的堆栈、所以又叫做TCP/IP协议栈）
+ TCP/IP 中包含一系列用于处理数据通信的协议</description>
+    </item>
+    
+    <item>
+      <title>iOS 中的锁🔒</title>
+      <link>http://example.org/posts/lock/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/lock/</guid>
+      <description>Lock 之前总结了atomic的安全性问题，那么在诸如此类的并发使用资源的情况下该如何保证线程安全呢，这篇主要想总结下各种锁的使用
+还使用之前电影院卖票的栗子来说明
+Theater.h
+@interface Theater : NSObject @property (nonatomic, assign) NSInteger ticketNum; @end main.m
+int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Theater *theater = [[Theater alloc] init]; // 定义总票数为2000  theater.ticketNum = 2000; // 并发队列用于卖票  dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作  for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
+    </item>
+    
+    <item>
+      <title>iOS 项目如何国际化</title>
+      <link>http://example.org/posts/international/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/international/</guid>
+      <description>Internationalization  随着项目越来越成熟，逐渐拓展到海外市场，我们就需要适配多种国际化和地区、需要对自己的产品进行国际化，让更多的用户可以使用我们的APP，这就需要对我们的产品进行国际化了。在这里就介绍一下自己在国际化项目里面踩过的一些坑。
+ Project配置  打开你的工程 ， 在左侧栏选中project 在打开的面板中选中project下的蓝色图标 找到Localizations选项 ， 添加你需要国家化的语言 在主工程下command + N 新建Localizable.string文件 选中你创建的string文件 ， 打开右侧面板 点击Localization组下的Localize按钮 把你刚才配置在工程内的选项添加进去就好。  调用方式 在以前调用的地方我们需要替换为本地化调用方式 比如以前我们是这么调用的：
+NSString *tips = @&amp;#34;wait&amp;#34;; 现在要换成
+NSString *tips = NSLocalizedString(@&amp;#34;wait&amp;#34;, nil); (ps 第二个是为了方便翻译人员理解上下文语境使用的 。)
+然后在stirng文件内添加对应的字符串：
+&amp;#34;wait&amp;#34; = &amp;#34;别着急&amp;#34;; 你可以在不同的文件添加对应不同语言的翻译 。
+让我们看下这个宏的定义 ：
+#define NSLocalizedString(key, comment) \ [NSBundle.mainBundle localizedStringForKey:(key) value:@&amp;#34;&amp;#34; table:nil] #define NSLocalizedStringFromTable(key, tbl, comment) \ [NSBundle.mainBundle localizedStringForKey:(key) value:@&amp;#34;&amp;#34; table:(tbl)] #define NSLocalizedStringFromTableInBundle(key, tbl, bundle, comment) \ [bundle localizedStringForKey:(key) value:@&amp;#34;&amp;#34; table:(tbl)] #define NSLocalizedStringWithDefaultValue(key, tbl, bundle, val, comment) \ [bundle localizedStringForKey:(key) value:(val) table:(tbl)] 可以看到实际上就是从mainBundle中取出了指定的String文件 ， 然后根据我们在代码中定义的 ‘key’ 值取出value</description>
+    </item>
+    
+    <item>
+      <title>KVC 键值编码</title>
+      <link>http://example.org/posts/kvc/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/kvc/</guid>
+      <description>Key-value coding  Key-value coding is a mechanism enabled by the NSKeyValueCoding informal protocol that objects adopt to provide indirect access to their properties. When an object is key-value coding compliant, its properties are addressable via string parameters through a concise, uniform messaging interface. This indirect access mechanism supplements the direct access afforded by instance variables and their associated accessor methods.
+ 以上是Apple对KVC的定义，翻译过来就是：
+ 键值编码是由NSKeyValueCoding非正式协议启用的机制，对象采用该机制提供对其属性的间接访问。 当对象符合键值编码时，其属性可通过字符串参数通过简洁，统一的消息传递接口寻址。 这种间接访问机制补充了实例变量及其相关访问器方法提供的直接访问。
+ 所有直接或者间接继承NSObject的对象都遵守 NSKeyValueCoding 协议，并默认提供实现，找到 NSKeyValueCoding.</description>
+    </item>
+    
+    <item>
+      <title>KVO 键值监听</title>
+      <link>http://example.org/posts/kvo/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/kvo/</guid>
+      <description>Key-Value Observing 键值观察，是设计模式中观察者模式的实现
+ 键值观察提供了一种机制，允许对象通知其他对象的特定属性的更改。它对应用程序中模型和控制器层之间的通信特别有用。（在OS X中，控制器层绑定技术严重依赖于键值观察。）控制器对象通常观察模型对象的属性，视图对象通过控制器观察模型对象的属性。然而，另外，模型对象可以观察其他模型对象（通常用于确定从属值何时改变）或甚至自身（再次确定从属值何时改变）。
+ 使用KVO Xcode -&amp;gt; New -&amp;gt; MacOS -&amp;gt; CommandLine 新建工程，创建Person类
+Person.h
+#import &amp;lt;Foundation/Foundation.h&amp;gt;  NS_ASSUME_NONNULL_BEGIN @interface Person : NSObject @property (nonatomic ,copy) NSString *name; @property (nonatomic ,assign) NSUInteger age; @property (nonatomic ,copy) NSArray&amp;lt;Person *&amp;gt; *friends; @end NS_ASSUME_NONNULL_END Person.m
+#import &amp;#34;Person.h&amp;#34;  @implementation Person - (instancetype)init { self = [super init]; if (self) { _name = @&amp;#34;&amp;#34;; _age = 0; _friends = @[]; } return self; } - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&amp;lt;NSKeyValueChangeKey,id&amp;gt; *)change context:(void *)context { // 当收到通知的时候打印观察的对象，旧值和新值  NSLog(@&amp;#34;\nReceving ObserveValueChanged \nObject: %@ OldValue: %@, NewValue: %@&amp;#34;,object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]); } // 重写以便打印对象的属性 - (NSString *)description { return [NSString stringWithFormat:@&amp;#34;- name: %@, age: %ld, friends: %@&amp;#34;,self.</description>
+    </item>
+    
+    <item>
+      <title>MVVM</title>
+      <link>http://example.org/posts/mvvm/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/mvvm/</guid>
+      <description>M-V-VM  目前客户端最流行的架构应该就是MVVM，然而在看了一些文章之后发现大部分是理论而并没有仔细讲解具体的架构方法和实践，这篇博客说说我在实际工作中的使用。
+ 引言 提到MVVM我们不得不先来认识一下MVC： MVC模式（Model–view–controller）是软件工程中的一种软件架构模式，把软件系统分为三个基本部分：模型（Model）、视图（View）和控制器（Controller）。MVC模式最早由Trygve Reenskaug在1978年提出[1]，是施乐帕罗奥多研究中心（Xerox PARC）在20世纪80年代为程序语言Smalltalk发明的一种软件架构。MVC模式的目的是实现一种动态的程序设计，使后续对程序的修改和扩展简化，并且使程序某一部分的重复利用成为可能。除此之外，此模式通过对复杂度的简化，使程序结构更加直观。软件系统通过对自身基本部分分离的同时也赋予了各个基本部分应有的功能。专业人员可以通过自身的专长分组：
+ 控制器（Controller）- 负责转发请求，对请求进行处理。 视图（View） - 界面设计人员进行图形界面设计。 模型（Model） - 程序员编写程序应有的功能（实现算法等等）、数据库专家进行数据管理和数据库设计(可以实现具体的功能)。  MVVM  MVVM是Model-View-ViewModel的简写，最早是由微软公司提出并运用，是MVP（Model-View-Presenter）模式与WPF结合的应用方式时发展演变过来的一种新型架构架构。MVVM有助于将图形用户界面的开发与业务逻辑或后端逻辑（数据模型）的开发分离开来，这是通过置标语言或GUI代码实现的。MVVM的视图模型是一个值转换器，这意味着视图模型负责从模型中暴露（转换）数据对象，以便轻松管理和呈现对象。在这方面，视图模型比视图做得更多，并且处理大部分视图的显示逻辑。视图模型可以实现中介者模式，组织对视图所支持的用例集的后端逻辑的访问。
+  模型 模型是指代表真实状态内容的领域模型（面向对象），或指代表内容的数据访问层（以数据为中心）。 视图 就像在MVC和MVP模式中一样，视图是用户在屏幕上看到的结构、布局和外观（UI）。 视图模型 视图模型是暴露公共属性和命令的视图的抽象。MVVM没有MVC模式的控制器，也没有MVP模式的presenter，有的是一个绑定器。在视图模型中，绑定器在视图和数据绑定器之间进行通信。 绑定器 声明性数据和命令绑定隐含在MVVM模式中。在Microsoft解决方案堆中，绑定器是一种名为XAML的标记语言。绑定器使开发人员免于被迫编写样板式逻辑来同步视图模型和视图。在微软的堆之外实现时，声明性数据绑定技术的出现是实现该模式的一个关键因素。  MVVM 的优点 解决controller过于臃肿 在MVC中很容易就会把一些业务逻辑，网络请求，数据IO都放在controller中
+注意,这里不是说MVC的控制器一定很臃肿，而是「容易变得臃肿」
+在我们新建一个工程的时候,苹果会自动帮我们生成一个ViewController,而在动手开始写代码的时候,往往控制不住就直接将逻辑写在Controller中。
+MVVM架构会要求我们把任何与非View的逻辑玻璃出来,Controller中除了绑定viewModel之外的代码只允许出现对View的操作。因为Controller对我们来说也只是一个View。
+逻辑分离， 易于测试 就像上面说的,业务逻辑都会抽离出来放在viewModel中 ，这样可以在任何地方重用这一堆业务
+除此之外,我们的代码将会更加易于测试,避免出现在MVC中可能出现的那种超长的方法、严重依赖全局状态导致难以测试的问题。
+View重用 在MVVM中,View只需要与ViewMode交互,不会收到其他的影响,所以不但vm、m 可以重用,view一样可以重复使用,修改的时候也更加方便。
+缺点 BUG与传递 由于在MVVM里面View和ViewModel是松耦合的,在测试出问题的时候就要排查各个地方的问题,
+有可能是vm中的也有可能是view中的。由于vm会传递数据,一个bug会很容易的传递到其他地方,引发更大的问题。
+并且其中一个地方出现问题的话,这个BUG就极有可能随着传递到其他的逻辑中,从而导致更严重的问题发生。
+需要维护额外的开销。 额外的viewModel使用也并不是无代价的,有可能由于各种原因导致管理起来稍微复杂。而额外的,如果因为强引用或其他原因导致的循环引用等内存不能正确释放的情况下,有可能会内存疯涨，所以需要确保你的使用方式是无副作用的。
+使用方法 上面说了这些只是一个大致的介绍,我们还是来看看应该怎样使用吧。
+你可以使用delegate的方式或者block的方式对view和viewModel进行桥接,在这里我们选择使用delegate,我认为这样看着比较直观,在代码中也更加明确。
+首先创建一个工程,选择singleViewApplication,我们就以最常见的的登陆功能作为示例
+新建用于由viewModel调用,view进行响应的protocol 首先要起个名字,就叫LoginViewModelDelegateProtocol 吧
+@protocol LoginViewModelDelegateProtocol &amp;lt;NSObject&amp;gt; @end 好,让我们想一想view会发送一些什么数据给VM ，VM都需要什么数据。
+对于简单登陆的VM来说,我们需要通知view的数据和方法
+ 登陆成功 错误提示 按钮状态改变（是否可以点击）  那么我们可以在protocol中添加方法了</description>
+    </item>
+    
+    <item>
+      <title>NSTimer 的一个小问题</title>
+      <link>http://example.org/posts/timer/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/timer/</guid>
+      <description>Timer 的一个小问题  开发过程中我们必不可少的需要接触定时器，在iOS中，常用的定时器有以下几种：
+  GCD Timer CADisplayLink NSTimer  这里我们主要来看下 NSTimer 的一个问题
+#import &amp;#34;ViewController.h&amp;#34;  @interface ViewController () @property (nonatomic, strong) NSTimer *t; @end @implementation ViewController - (void)viewDidLoad { [super viewDidLoad]; } - (void)startTImer { _t = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(someBussiness) userInfo:nil repeats:true]; [[NSRunLoop currentRunLoop] addTimer:_t forMode:NSRunLoopCommonModes]; } - (void)someBussiness { NSLog(@&amp;#34;timer triggered&amp;#34;); } - (void)dealloc { NSLog(@&amp;#34;Controller dealloc&amp;#34;); if (self.t) { [self.t invalidate]; } } - (void)touchesBegan:(NSSet&amp;lt;UITouch *&amp;gt; *)touches withEvent:(UIEvent *)event { if (self.</description>
+    </item>
+    
+    <item>
+      <title>ObjC Runtime 是什么</title>
+      <link>http://example.org/posts/runtime/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/runtime/</guid>
+      <description>Runtime 我们看下苹果官方文档对runtime的定义
+ The Objective-C runtime is a runtime library that provides support for the dynamic properties of the Objective-C language, and as such is linked to by all Objective-C apps. Objective-C runtime library support functions are implemented in the shared library found at /usr/lib/libobjc.A.dylib.
+ 译文如下
+ Objective-C运行时是一个运行时库，它提供对Objective-C语言的动态属性的支持，因此被所有Objective-C应用程序链接。 Objective-C运行时库支持函数在/usr/lib/libobjc.A.dylib中的共享库中实现。
+ 在Objective-C中，消息直到运行时才绑定到方法实现。编译器将把方法调用转化为消息发送
+这也是Objective-C被称为动态语言的原因
+例如如下代码
+[receiver message] 将会被转化为这种调用方式
+objc_msgSend(receiver, selector) 在消息需要绑定参数的时候会转化如下
+objc_msgSend(receiver, selector, arg1, arg2, ...) 那么抓花为发送消息之后都做了什么呢?
+[receiver message]  通过receiver的 isa 指针 查找它的 Class 查找 Class 下的 methodLists 如果 methodLists 没有相应的方法则递归查找 superClass 的 methodLists 如果在 methodLists 里面找到了 对应的 message 则 获取实现指针 imp 并执行 发送方法返回值  这里我们发现还缺少了一种情况，那就是递归在父类的methodlist里面也没有找到对应的实现，这个时候就会报错 unrecognized selector send to instance X</description>
+    </item>
+    
+    <item>
+      <title>ObjC 中的原子性</title>
+      <link>http://example.org/posts/atomic/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/atomic/</guid>
+      <description>atomic 前言 在使用 @property 修饰成员变量的时候，会设置一个默认的缺省值 atomic
+@property (assign) NSInteger ticketNum; 以上写法等同于
+@property (atomic, assign) NSInteger ticketNum; atomic ，顾名思义是原子的，也就是说使用 atomic 修饰能够保证属性的线程安全，那么它真的做到了吗
+安全性证明 首先定义一个电影院类，向电影院添加一个总票数的属性
+#import &amp;lt;Foundation/Foundation.h&amp;gt;  NS_ASSUME_NONNULL_BEGIN @interface Theater : NSObject @property (atomic, assign) NSInteger ticketNum; @end NS_ASSUME_NONNULL_END 接下来我们模拟卖票的过程
+Theater *theater = [[Theater alloc] init]; // 定义总票数为2000 theater.ticketNum = 2000; // 并发队列用于卖票 dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作 for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
+    </item>
+    
+    <item>
+      <title>ObjC 的 weak 修饰</title>
+      <link>http://example.org/posts/weak/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/weak/</guid>
+      <description>Weak 我们在代码中可以找到很多地方使用了weak来修饰成员变量，比如
+@property (nonatomic, weak, nullable) id &amp;lt;UITableViewDelegate&amp;gt; delegate; Weak的作用  weak 用于修饰的对象被赋值不会引起retain，销毁也不会release，weak指针指向的对象一旦被释放，weak的指针将会被置为nil
+ 大部分情况下我们的代码中都会存在着各种持有其他对象的情况，而被持有的对象可能由于某些需求需要访问原对象，那么就会导致互相持有对方，在ARC下，俩个对象互相持有将导致内存一直无法释放，因为每个对象在自动释放池中的retainCount都大于0。由于weak的特性，这个时候就轮到他出场了
+什么时候应该用Weak  通常在使用代理模式的时候应该使用weak来避免循环引用 在使用block时需要引用block外部的变量的时候可以用weak来断链 需要对象释放是自动置为nil，防止野指针错误   这里有个小技巧，只要你的类要完成的功能是需要借用的，就用weak
+ Weak实现的机制 我们现在只知道在weak对象销毁后会置为nil，接下来我们从源码角度看看weak到底是如何实现的
+NSObject *one = [[NSObject alloc] init]; __weak typeof(one) oneWeak = one; 在代码中单步断点，我们可以看到进入了这个方法
+ObjCSample`objc_initWeak: -&amp;gt; 0x100000e7e &amp;lt;+0&amp;gt;: jmpq *0x1cc(%rip) ; (void *)0x0000000100000ed0 看到这个方法就好办了，我们掏出源码瞅瞅这个方法做了啥
+NSObject.mm
+/** * Initialize a fresh weak pointer to some object location. * It would be used for code like: * * (The nil case) * __weak id weakPtr; * (The non-nil case) * NSObject *o = .</description>
+    </item>
+    
+    <item>
+      <title>ObjC 的 weak 修饰</title>
+      <link>http://example.org/posts/darknet/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/darknet/</guid>
+      <description>Darknet 很多人对暗网都很好奇，各种电视剧和电影也或多或少的提到了这个网络，我觉得有必要专门写一篇博客来向大家分享一下
+What is Darknet 先看一下维基百科词条「暗网」的定义
+ 暗网（英语：Dark web）是存在于黑暗网络、覆盖网络上的万维网内容，只能用特殊软件、特殊授权、或对计算机做特殊设置才能访问。暗网构成了深网的一小部分，深网网络没有被网络搜索引擎索引，有时“深网”这一术语被错误地用于指代暗网。 构成暗网的黑暗网络包括F2F的小型点对点网络以及由公共组织和个人运营的大型流行网络，如Tor、自由网、I2P和Riffle。暗网用户基于常规网络未加密的性质将其称为明网。Tor暗网可以称为洋葱区域（onionland），其使用网络顶级域后缀.onion和洋葱路由的流量匿名化技术。
+ 要了解什么是暗网，首先要先了解网络世界都有哪几部分，
+通俗来说，网络世界可以用这个列表来形容
+ 明网 深网  暗网    Tor Tor，全称为 the onion router。
+可以说，正是洋葱路由促进了暗网世界的发展，
+在1995年，由美国海军研究实验室的，开始研发了一哥项目，目的是在互联网上隐藏访问痕迹，由于其利用的技术像洋葱一样，剥开一层后仍会看到一层，所以叫做洋葱路由。
+该技术最初由美国海军研究办公室和国防部高级研究项目署(DARPA)资助。早期的开发由Paul Syverson、 Michael Reed 和 David Goldschla领导。这三个人都是供职美国军方的数学家和计算机系统的研究人员。
+Tor的最初目的并不是保护隐私，或者至少不是保护大部分人认为的那种“隐私”，它的目的是让情报人员的网上活动不被敌对国监控。在美国海军研究实验室1997 年的一篇论文中指出，“随着军事级别的通信设备日益依靠公共通讯网络，在使用公共通信基础设施时如何避免流量分析变得非常重要。此外，通信的匿名性也非常必要。”
+该项目初期进展缓慢，到 2002 年，来自海军研究机构的Paul Syverson 还留在项目里，两个MIT的毕业生 Roger Dingledine 和 Nick Mathewson 加入了项目。 这两个人不是海军研究实验室的正式雇员。而是作为 DARPA和海军研究实验室的高可靠性计算系统的合同工方式加入的。在后来的几年里，这三个人开发了一个新版的洋葱路由，也就是后来的 Tor(The Onion Router)。
+Tor访问的原理 那么，Tor是如何工作的呢，
+ 访问发生时，客户端要先向目录服务器获取中继节点列表 从节点列表中随机选择三个最优节点 使用节点建立链路（circuit），每一步的访问都会通过TLS加密发送  那么你可能会问，这样就无法被追踪了吗？其实重点就在于建立链路发送数据包的过程
+Tor的数据包Cell如下
+   CircID CMD DATA     2字节 1字节 509字节    其中，CircID由客户端随机生成，用来区分不同的链路，CMD表示数据包要执行的动作，DATA负载着发送的数据</description>
+    </item>
+    
+    <item>
+      <title>Runloop 运行循环</title>
+      <link>http://example.org/posts/runloop/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/runloop/</guid>
+      <description>RunLoop 什么是RunLoop？
+ A RunLoop object processes input for sources such as mouse and keyboard events from the window system, Port objects, and NSConnection objects. A RunLoop object also processes Timer events. Your application neither creates or explicitly manages RunLoop objects. Each Thread object—including the application’s main thread—has an RunLoop object automatically created for it as needed. If you need to access the current thread’s run loop, you do so with the class method current.</description>
+    </item>
+    
+    <item>
+      <title>SDWebimage 的高明之处</title>
+      <link>http://example.org/posts/sdwebimage/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/sdwebimage/</guid>
+      <description>SDWebImage 在上古时代，最粗暴的为imageView添加图片的姿势是这样的
+NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:@&amp;#34;https://github.com/FelixScat/Pub/blob/master/image/retainCircle.png?raw=true&amp;#34;]]; [self.imgV setImage:[UIImage imageWithData:data]]; 而目前大部分iOS应用中都使用了网络图片缓存框架，使用最多的莫过于 SDWebImage 了，这篇主要从源码角度分析下，因为源码比较多，下文例子中可能会进行一些删减
+调用接口 使用 SD 发起图片请求仅仅需要一行代码
+[self.imgV sd_setImageWithURL:[NSURL URLWithString:@&amp;#34;https://cn.bing.com/sa/simg/hpc26.png&amp;#34;]]; 我们可以追踪进文件 UIImageView+WebCache 里面
+- (void)sd_setImageWithURL:(nullable NSURL *)url { [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:nil]; } - (void)sd_setImageWithURL:(nullable NSURL *)url placeholderImage:(nullable UIImage *)placeholder { [self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:nil]; } - (void)sd_setImageWithURL:(nullable NSURL *)url placeholderImage:(nullable UIImage *)placeholder options:(SDWebImageOptions)options { [self sd_setImageWithURL:url placeholderImage:placeholder options:options progress:nil completed:nil]; } ... 这里发现这些方法最终都会调用同一个方法，相当于便利方法，为不同的需求提供多种接口，下面最终的方法是这样的
+- (void)sd_setImageWithURL:(nullable NSURL *)url placeholderImage:(nullable UIImage *)placeholder options:(SDWebImageOptions)options context:(nullable SDWebImageContext *)context progress:(nullable SDImageLoaderProgressBlock)progressBlock completed:(nullable SDExternalCompletionBlock)completedBlock { [self sd_internalSetImageWithURL:url placeholderImage:placeholder options:options context:context setImageBlock:nil progress:progressBlock completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) { if (completedBlock) { completedBlock(image, error, cacheType, imageURL); } }]; } 这里调用的sd_internalSetImageWithURL方法是 UIView的分类，作者应该是希望和UIButton复用一份代码，所以把核心逻辑作为了UIView的分类</description>
+    </item>
+    
+    <item>
+      <title>我们应该如何优化网络层</title>
+      <link>http://example.org/posts/network-layer-optimization/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/network-layer-optimization/</guid>
+      <description>Network Layer Optimization 网络层优化方案
+iOS应用中通常使用大量的服务端数据，那么如何保证我们的网络尽可能快速稳定的为用户传输数据其实也是开发中的重中之重，本篇笔者将会会分为几个角度来设计优化方案
+首先，一个请求包含了那些步骤
+ 客户端拼装发送请求 DNS解析域名解析 TCP握手 TLS/SSL握手 服务端接收处理数据并返回 客户端解析  在这些步骤当中，有很多我们可以优化的空间。废话不多说，看看我们能做啥
+客户端拼装请求阶段 我们在很多的请求中都是先从模型层获取数据再把数据通过一定的格式传递给服务端，那么这里就涉及到几个点
+ 服务端需要的数据是什么结构？ 传输的格式是怎样的？  一般的请求大多使用表单或是json的方式来序列化请求数据，如果某个接口可能提交大量的数据不妨使用 Protocol Buffers 和无服务端进行交互，还有，如果服务端所需要的是某中对象的列表的时候我们可以协商是否需要模型的全部属性交互，如果不需要的话我们就可以把多余的属性去掉再进行序列化
+DNS解析阶段 比如我们所要请求的host是https://bing.com，最终想要找到我们的服务是需要将域名解析为具体的IP
+ 本地缓存查询 如果缓存命中则使用本地缓存的ip信息 缓存失效或不存在则向DNS服务请求解析  通常会面临以下问题
+ DNS劫持 缓存失效导致需要重复请求  目前业内普遍采取的方法是采用 HTTP DNS 替换 LocalDNS ，绕过运营商DNS，向自建的具备DNS解析功能的web服务进行请求，替换后能够起到如下的作用
+ 可控刷新率，防止解析异常 直接以用户IP为导向，提升精准度 方便未来扩展  同时客户端可以配合服务端动态更新服务IP列表，选择网速最佳的进行请求
+TCP 部署服务的机器可以考虑更新更换TCP拥塞控制算法如BBR
+HTTP  Keep-Alive 复用TCP链接 Pipeline 管道化请求，是我们无需等待上一个请求完成就可以立即发起下一个  在用户使用App的时候，由于移动网络的特性可能导致网络信号的不稳定，我们可以根据当前用户的网络情况动态调整，比如在网络差的时候使用串行请求，延长超时时间
+使用 Throttle 对网络请求进行节流处理，比如 AFNetworking 的 throttleBandwidthWithPacketSize 方法
+业务方面 很多大列表类似的数据尽量使用分页处理，在用户重复频繁的访问某个页面的时候尤其有用，详情数据和列表数据内容可以做区分，列表页只返回最小化的数据更加有利于用户体验
+对于内嵌的HTML等资源做缓存，避免每次都请求，一般可以使用if-modify或是其他的标记来做
+当某个api请求失败后，如果并不是post等对数据更改的接口可以使用多次重试机制</description>
+    </item>
+    
+    <item>
+      <title>搞一搞设计模式</title>
+      <link>http://example.org/posts/design-pattern/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/design-pattern/</guid>
+      <description>Design pattern 怎样写出优雅，直观，清晰的代码？这就少不了对设计模式的理解与应用，这篇主要总结归纳一下常见的设计模式和在iOS开发过程中的应用
+在这之前，我们需要先回顾一下设计原则
+ 单一职责原则 (Single Responsibility Principle) 开放-封闭原则 (Open-Closed Principle) 里氏替换原则 (Liskov Substitution Principle) 依赖倒转原则 (Dependence Inversion Principle) 接口隔离原则 (Interface Segregation Principle) 迪米特法则 (Law Of Demeter) 组合/聚合复用原则 (Composite/Aggregate Reuse Principle)  下面是不同设计模式的分类，大致分为三类：
+ 创建型模式 结构型模式 行为型模式  创建型模式  简单工厂模式 工厂模式 抽象工厂模式 单例模式 建造者模式 原型模式  简单工厂模式 描述：简单工厂模式(Simple Factory Pattern)：又称为静态工厂方法(Static Factory Method)模式，它属于类创建型模式。在简单工厂模式中，可以根据参数的不同返回不同类的实例。简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。
+假设你有一个商店，在卖两种产品
+protocol Product {} class Product_A: Product {} class Product_B: Product {} class Store { func sellProduct(type: Int) -&amp;gt; Product?</description>
+    </item>
+    
+    <item>
+      <title>方便安全的缓存NSCache</title>
+      <link>http://example.org/posts/nscache/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/nscache/</guid>
+      <description>NSCache NSCache 基本上就是一个会自动移除对象来释放内存的 NSMutableDictionary。无需响应内存警告或者使用计时器来清除缓存。唯一的不同之处是键对象不会像 NSMutableDictionary 中那样被复制，这实际上是它的一个优点（键不需要实现 NSCopying 协议）。
+先列一下使用NSCache的好处  NSCache是一个类似NSDictionary一个可变的集合。 提供了可设置缓存的数目与内存大小限制的方式。 保证了处理的数据的线程安全性。 缓存使用的key不需要是实现NSCopying。 当内存警告时内部自动清理部分缓存数据。  NSCache的属性与方法 @property (assign) id&amp;lt;NSCacheDelegate&amp;gt;delegate; cache对象的代理 ， 用来即将清理cache的时候得到通知
+- (void)cache:(NSCache *)cache willEvictObject:(id)obj; 代理方法 ， 这里面不要对cache进行改动 ， 如果对象obj需要被持久化存储的话可以在这里进行操作
+这里面有几种情况会导致该方法执行：
+ 手动移除（removeObjectForKey） 缓存超过设定的上线 App不活跃 系统内存爆炸  @property BOOL evictsObjectsWithDiscardedContent; 该属性默认为True ， 表示在内存销毁时丢弃该对象 。
+@property NSUInteger totalCostLimit; 总成本数 ， 用来设置最大缓存数量
+开始使用NSCache // // TDFSetPhoneNumController.m // TDFLoginModule // // Created by doubanjiang on 2017/6/5. // Copyright © 2017年 doubanjiang. All rights reserved.</description>
+    </item>
+    
+    <item>
+      <title>浅谈 ObjC 中的几种copy</title>
+      <link>http://example.org/posts/copy/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/copy/</guid>
+      <description>Copy 拷贝是我们在开发中经常使用的技巧，这里指的不是到Github上去复制粘贴代码，而是对内存中对象的操作 (逃
+ 深拷贝与浅拷贝的区别 ？ 深拷贝是指我们拷贝出来的对象拥有自己单独的内存地址，修改新对象不影响源对象，浅拷贝指的是在copy指针的引用，修改新对象会影响到源对象
+ 在ObjC里面主要有两个方法对对象进行拷贝
+- (id)copy; - (id)mutableCopy; 要对象能够使用这两个方法需要遵守协议 NSCopying, NSMutableCopying
+那么，该何时使用这两种方法呢， 先说结论，只有不可变对象调用copy方法的时候才是浅拷贝，其他情况均为深拷贝 新建一个工程验证一下吧
+Xcode -&amp;gt; New -&amp;gt; MacOS -&amp;gt; CommandLine -&amp;gt; main.m
+由于NSString 同时实现了 NSCopying, NSMutableCopying 两个协议，我们就用他来做实验
+NSString *str1 = @&amp;#34;str1&amp;#34;; NSString *str2 = str1.copy; NSString *str3 = str1.mutableCopy; NSLog(@&amp;#34;%p %p %p&amp;#34;,str1, str2, str3); 运行之后可以看到如下输出
+0x1000020b8 0x1000020b8 0x100508e00 由此可以得出结论，不可变对象使用 mutableCopy 为深拷贝 ，copy 为浅拷贝
+下面验证一下可变对象 NSMutableString
+NSMutableString *str1 = [NSMutableString stringWithFormat:@&amp;#34;str1&amp;#34;]; NSString *str2 = str1.copy; NSString *str3 = str1.</description>
+    </item>
+    
+    <item>
+      <title>聊聊 ObjC 的 Class</title>
+      <link>http://example.org/posts/class/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/class/</guid>
+      <description>Class @interface NSObject &amp;lt;NSObject&amp;gt; { Class isa OBJC_ISA_AVAILABILITY; @end ObjC是一门面向对象的语言，参考了Smalltalk的消息传递机制，那么对于开发者来说，对象、类、元类这些究竟是什么呢，他们之间的关系又是怎样的呢，这篇主要写一点对类结构的总结，偏向原理
+实例对象 #import &amp;lt;Foundation/Foundation.h&amp;gt;  @interface Person: NSObject @property (nonatomic, copy) NSString *name; @end @implementation Person - (void)greeting { NSLog(@&amp;#34;Hi, I&amp;#39;m %@&amp;#34;, self.name); } @end int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Person *person = [[Person alloc] init]; person.name = @&amp;#34;Alice&amp;#34;; [person greeting]; } return 0; } 我们首先实例化一个Person对象，然后调用setter为name赋值，再调用person的实例方法greeting
+我们看一下使用clang转换之后的代码
+int main(int argc, const char * argv[]) { /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; Person *person = ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass(&amp;#34;Person&amp;#34;), sel_registerName(&amp;#34;alloc&amp;#34;)), sel_registerName(&amp;#34;init&amp;#34;)); ((void (*)(id, SEL, NSString *))(void *)objc_msgSend)((id)person, sel_registerName(&amp;#34;setName:&amp;#34;), (NSString *)&amp;amp;__NSConstantStringImpl__var_folders_60_yqdp8_yn6vbd1tl6s3k479sr0000gp_T_main_5be332_mi_1); ((void (*)(id, SEL))(void *)objc_msgSend)((id)person, sel_registerName(&amp;#34;greeting&amp;#34;)); } return 0; } 代码的大体逻辑是这样的：</description>
+    </item>
+    
+    <item>
+      <title>重构是什么？如何重构？</title>
+      <link>http://example.org/posts/refactor/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/refactor/</guid>
+      <description>About Refactor 很多项目在最开始的时候可能会希望快速迭代，这个时候由于考虑不到位、不周全，很多的项目在后面可能会面临无法继续维护，增加新特性的问题。
+何时重构 发现问题的时候就是重构的最佳时机
+嘴里总是会说，下个版本重构，下个版本重构，这就像是 明日复明日，明日何其多 ，不然真的到了无法维护的地步再去重构那将面临的巨大工作量，代价将会是巨大的
+怎样重构 在重构的时候我们可能同时还有很多项目会并行进行，这个时候如何重构就要因情况而定了
+ 你的TeamLeader专门安排了重构项目（短期小规模） 你需要大规模重构切时间跨度较大 你需要在项目中完成重构并且时间有限  针对以上的不同情况我们有不同的重构方案，
+在短期小规模并且专门进行重构的时候我们可以直接将需要旧代码重写掉，这个时候一定要注意，重构的前提是测试，你需要将测试用例完善后再开始写代码，千万不要前后颠倒
+那么在时间有限的项目或事大规模的重构中我们应该如何做呢，这个时候就会有两种方式
+ 将所有重构放在新的版本控制分支上，全部更新完成后合并回主分支 一边重构一边开发，同时进行在项目分支上  全部做完再合并回主分支会有一个缺点，当你完成全部工作合并回主干分支的时候可能会遇到海量的冲突，会很烦躁，如果你平时持续的合并也可能会遇到各种冲突，那么最佳解决办法其实就是第二种，开发的同时进行重构。
+怎样能够在开发的同时重构呢，要知道，完成整个重构项目可能会经历多个项目才能完成，这里就可以用设计模式中的桥接模式进行处理
+比如我们有以下用来记录日志的工具
+struct CommonLog { func log(str: String) { print(str) } } 在重构的时候则可以这样改
+protocol logable { func log(str: String) -&amp;gt; Void } struct NewLog: logable { func log(str: String) { print(&amp;#34;new:&amp;#34; + str) } } struct CommonLog { let newLog: logable? func log(str: String) { #if !DEBUG print(str) #endif #if DEBUG if let newLog = newLog { newLog.</description>
+    </item>
+    
+    <item>
+      <title>用Swift写个简单的区块链系统</title>
+      <link>http://example.org/posts/blockchain/</link>
+      <pubDate>Tue, 19 Feb 2019 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/blockchain/</guid>
+      <description>BlockChainServer 源码地址
+最近身边的许多人都开始玩比特币，虽然本人不炒但是想稍微了解一下其中的原理，所以就练手写了一个简易版的区块链系统。
+So 、 What is the BlockChain (区块链) ? 这里引用一下Google的结果
+ 所谓区块链技术 ， 简称BT（Blockchain technology），也被称之为分布式账本技术，是一种互联网数据库技术，其特点是去中心化、公开透明，让每个人均可参与数据库记录。
+ Base (基础概念)  交易（Transaction）：一次操作，导致账本状态的一次改变，如添加一条记录； 区块（Block）：记录一段时间内发生的交易和状态结果，是对当前账本状态的一次共识； 链（Chain）：由一个个区块按照发生顺序串联而成，是整个状态变化的日志记录。   如果把区块链作为一个状态机，则每次交易就是试图改变一次状态，而每次共识生成的区块，就是参与者对于区块中所有交易内容导致状态改变的结果进行确认。
+ 简单理解就是:
+ 如果我们把数据库假设成一本账本，读写数据库就可以看做一种记账的行为，区块链技术的原理就是在一段时间内找出记账最快最好的人，由这个人来记账，然后将账本的这一页信息发给整个系统里的其他所有人。这也就相当于改变数据库所有的记录，发给全网的其他每个节点，所以区块链技术也称为分布式账本（distributed ledger）。
+ Vapor (用来开发服务端的Swift框架) 既然要用swift实现 ， 我在这里就选择vapor作为服务端框架来使用 ， vapor里面有意思的东西很多 ， 这里只介绍基本的操作而不深究其原理 。
+Install 前置条件 ， 这里我们使用macOS进行开发部署 ， 以下是需要软件和版本。
+ Install Xcode 9.3 or greater from the Mac App Store. Vapor requires Swift 4.1 or greater. Vapor Toolbox: 3.1.7 Vapor Framework: 3.</description>
+    </item>
+    
+  </channel>
+</rss>

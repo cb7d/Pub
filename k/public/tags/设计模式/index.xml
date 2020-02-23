@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>“设计模式”&#34; on Cb7d</title>
+    <link>http://example.org/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</link>
+    <description>Recent content in “设计模式”&#34; on Cb7d</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>All rights reserved - 2020</copyright>
+    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    
+	<atom:link href="http://example.org/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>搞一搞设计模式</title>
+      <link>http://example.org/posts/design-pattern/</link>
+      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/design-pattern/</guid>
+      <description>Design pattern 怎样写出优雅，直观，清晰的代码？这就少不了对设计模式的理解与应用，这篇主要总结归纳一下常见的设计模式和在iOS开发过程中的应用
+在这之前，我们需要先回顾一下设计原则
+ 单一职责原则 (Single Responsibility Principle) 开放-封闭原则 (Open-Closed Principle) 里氏替换原则 (Liskov Substitution Principle) 依赖倒转原则 (Dependence Inversion Principle) 接口隔离原则 (Interface Segregation Principle) 迪米特法则 (Law Of Demeter) 组合/聚合复用原则 (Composite/Aggregate Reuse Principle)  下面是不同设计模式的分类，大致分为三类：
+ 创建型模式 结构型模式 行为型模式  创建型模式  简单工厂模式 工厂模式 抽象工厂模式 单例模式 建造者模式 原型模式  简单工厂模式 描述：简单工厂模式(Simple Factory Pattern)：又称为静态工厂方法(Static Factory Method)模式，它属于类创建型模式。在简单工厂模式中，可以根据参数的不同返回不同类的实例。简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。
+假设你有一个商店，在卖两种产品
+protocol Product {} class Product_A: Product {} class Product_B: Product {} class Store { func sellProduct(type: Int) -&amp;gt; Product?</description>
+    </item>
+    
+  </channel>
+</rss>
