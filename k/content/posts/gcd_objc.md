@@ -1,0 +1,1 @@
+../../../posts/thread/gcd_objc.md

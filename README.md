@@ -1,22 +1,34 @@
-# [Cb7d](https://k.felixplus.top/)
+---
+title: "About Me"
+date: 2020-02-19T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog"]
+---
+
+# [Cb7d的Github](https://github.com/cb7d)
 
 > 欢迎来到 Felix匀昊 的博客，在下的小地方蓬荜生辉 ^_^
 
-![](https://min.felixplus.top/public/blog/wp-city-sea.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200215%2F%2Fs3%2Faws4_request&X-Amz-Date=20200215T125622Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=1d36128911e1bc1bf1cd27e8adac5bb1d682fb5f87e8579f0294de7a093b573b)
+![Paper](https://min.felixplus.top/public/blog/wp-city-sea.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&X-Amz-Date=20200223T144452Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=26bb1074e8088589efa38f6bfebd8677b1a8b293526061472309991aedcf3df8)
 
 ---
 
 ## WHY
 
-有的朋友会问为什么你有自己的博客，还要搞这么个网站出来呢
+为什么写这么一个博客
 
-这里我想说，很多知识不是你认为学会了就可以，单单写下来也是不够的
+我认为很多知识不是你认为学会了就可以，单单写下来也是不够的
 
-我想在这里把自己学到的一点皮毛慢慢积累下来
+我想在这里把自己学到的一点皮毛慢慢积累下来，能把这些东西关联起来
+
+- 可以时常温习自己会的一些知识
+- 把这些知识分类关联起来
+- 希望能帮到其他人，自己踩过的坑可以让看的人借鉴
 
 ### 织网
 
-在博客上写的一些东西写完之后可能很久都不会去看，放在这里可以帮助我把这些织成一张网，让每个知识点都能融会贯通，也更有逻辑性
+放在这里可以帮助我把这些织成一张网，让每个知识点都能融会贯通，也更有逻辑性
 
 ## WHAT
 
@@ -36,7 +48,14 @@
 
 ## ABOUT
 
-最后关于我自己，我是匀昊，开发届的小学生，目前在快手-杭州工作
+最后关于我自己
+
+- 我是匀昊
+- 开发届的小学生
+- 现居住在杭州
+- 目前在快手工作
+
+如果有疑惑的建议欢迎发邮件沟通
 
 欢迎发邮件联系：cb7d23@gmail.com
 

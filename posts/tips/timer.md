@@ -1,3 +1,11 @@
+---
+title: "NSTimer 的一个小问题"
+date: 2019-07-13T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC","tips"]
+---
+
 # Timer 的一个小问题
 
 > 开发过程中我们必不可少的需要接触定时器，在iOS中，常用的定时器有以下几种：

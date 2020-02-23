@@ -1,0 +1,1 @@
+../../../posts/thread/atomic.md

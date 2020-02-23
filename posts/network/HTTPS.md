@@ -1,6 +1,14 @@
+---
+title: "HTTPS"
+date: 2019-03-27T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","HTTP"]
+---
+
 # HTTPS
 
-最近又看了一遍 [HTTP权威指南]，每次想写个总结的时候都会拖延症爆发，今天决定简单总结下我们日常使用的的HTTP。
+最近又看了一遍 [HTTP权威指南]，每次想写个总结的时候都会拖延症爆发，今天决定简单总结下我们日常使用的的网络传输协议和TLS相关。
 
 ## OSI (Open System Interconnect)
 

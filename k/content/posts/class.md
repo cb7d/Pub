@@ -1,0 +1,1 @@
+../../../posts/runtime/class.md

@@ -1,3 +1,11 @@
+---
+title: "方便安全的缓存NSCache"
+date: 2019-05-21T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC"]
+---
+
 # NSCache
 
 NSCache 基本上就是一个会自动移除对象来释放内存的 NSMutableDictionary。无需响应内存警告或者使用计时器来清除缓存。唯一的不同之处是键对象不会像 NSMutableDictionary 中那样被复制，这实际上是它的一个优点（键不需要实现 NSCopying 协议）。

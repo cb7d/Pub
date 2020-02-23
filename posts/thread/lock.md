@@ -1,3 +1,11 @@
+---
+title: "iOS 中的锁🔒"
+date: 2019-04-21T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC","thread"]
+---
+
 # Lock
 
 之前总结了[atomic的安全性问题](https://github.com/FelixScat/Pub/blob/master/posts/atomic.md)，那么在诸如此类的并发使用资源的情况下该如何保证线程安全呢，这篇主要想总结下各种锁的使用

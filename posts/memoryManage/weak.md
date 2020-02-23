@@ -1,3 +1,11 @@
+---
+title: "ObjC 的 weak 修饰"
+date: 2019-07-19T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC"]
+---
+
 # Weak
 
 我们在代码中可以找到很多地方使用了weak来修饰成员变量，比如

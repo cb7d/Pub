@@ -1,3 +1,11 @@
+---
+title: "Clang简单上手"
+date: 2018-06-11T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","Clang"]
+---
+
 # Clang
 
 作为一个iOS工程师，每次看到Xcode在进行漫长的编译的时候总是忍不住想深究一下自己手写的BUG是如何被生成的，所以下定决定研究一下我们的编译器
