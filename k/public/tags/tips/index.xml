@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 13 Jul 2019 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/tips/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>NSTimer 的一个小问题</title>
       <link>http://example.org/posts/timer/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Sat, 13 Jul 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/timer/</guid>
       <description>Timer 的一个小问题  开发过程中我们必不可少的需要接触定时器，在iOS中，常用的定时器有以下几种：
@@ -26,7 +26,7 @@
     <item>
       <title>重构是什么？如何重构？</title>
       <link>http://example.org/posts/refactor/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Thu, 23 May 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/refactor/</guid>
       <description>About Refactor 很多项目在最开始的时候可能会希望快速迭代，这个时候由于考虑不到位、不周全，很多的项目在后面可能会面临无法继续维护，增加新特性的问题。

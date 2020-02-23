@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Tue, 19 Feb 2019 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 14 May 2018 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/blockchain/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>用Swift写个简单的区块链系统</title>
       <link>http://example.org/posts/blockchain/</link>
-      <pubDate>Tue, 19 Feb 2019 10:46:42 +0800</pubDate>
+      <pubDate>Mon, 14 May 2018 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/blockchain/</guid>
       <description>BlockChainServer 源码地址

@@ -7,15 +7,25 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Fri, 21 Feb 2020 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 11 Jun 2019 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/swift/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Runloop 运行循环</title>
+      <link>http://example.org/posts/runloop/</link>
+      <pubDate>Tue, 11 Jun 2019 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/runloop/</guid>
+      <description>RunLoop 什么是RunLoop？
+ A RunLoop object processes input for sources such as mouse and keyboard events from the window system, Port objects, and NSConnection objects. A RunLoop object also processes Timer events. Your application neither creates or explicitly manages RunLoop objects. Each Thread object—including the application’s main thread—has an RunLoop object automatically created for it as needed. If you need to access the current thread’s run loop, you do so with the class method current.</description>
+    </item>
+    
+    <item>
       <title>GCD (Swift)</title>
       <link>http://example.org/posts/gcd_swift/</link>
-      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Mon, 25 Mar 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/gcd_swift/</guid>
       <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在swift中的使用，文中示例代码
@@ -36,7 +46,7 @@ git clone https://github.com/FelixScat/demo_GCD.git cd swiftGCD swift package ge
     <item>
       <title>cocoapods</title>
       <link>http://example.org/posts/cocoapods/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Sat, 16 Jun 2018 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/cocoapods/</guid>
       <description>CocoaPods CocoaPods是OS X和iOS下的一个第三类库管理工具，通过CocoaPods工具我们可以为项目添加被称为“Pods”的依赖库（这些类库必须是CocoaPods本身所支持的），并且可以轻松管理其版本。
@@ -54,19 +64,9 @@ rvm use 2.6.3 --default 安装和使用bundle gem install bundler 然后在工�
     </item>
     
     <item>
-      <title>Runloop 运行循环</title>
-      <link>http://example.org/posts/runloop/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
-      
-      <guid>http://example.org/posts/runloop/</guid>
-      <description>RunLoop 什么是RunLoop？
- A RunLoop object processes input for sources such as mouse and keyboard events from the window system, Port objects, and NSConnection objects. A RunLoop object also processes Timer events. Your application neither creates or explicitly manages RunLoop objects. Each Thread object—including the application’s main thread—has an RunLoop object automatically created for it as needed. If you need to access the current thread’s run loop, you do so with the class method current.</description>
-    </item>
-    
-    <item>
       <title>用Swift写个简单的区块链系统</title>
       <link>http://example.org/posts/blockchain/</link>
-      <pubDate>Tue, 19 Feb 2019 10:46:42 +0800</pubDate>
+      <pubDate>Mon, 14 May 2018 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/blockchain/</guid>
       <description>BlockChainServer 源码地址

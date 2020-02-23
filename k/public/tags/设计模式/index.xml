@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 21 Mar 2019 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>搞一搞设计模式</title>
       <link>http://example.org/posts/design-pattern/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Thu, 21 Mar 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/design-pattern/</guid>
       <description>Design pattern 怎样写出优雅，直观，清晰的代码？这就少不了对设计模式的理解与应用，这篇主要总结归纳一下常见的设计模式和在iOS开发过程中的应用

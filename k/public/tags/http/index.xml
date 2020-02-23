@@ -7,27 +7,15 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 11 May 2019 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/http/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>HTTPS</title>
-      <link>http://example.org/posts/https/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
-      
-      <guid>http://example.org/posts/https/</guid>
-      <description>HTTPS 最近又看了一遍 [HTTP权威指南]，每次想写个总结的时候都会拖延症爆发，今天决定简单总结下我们日常使用的的网络传输协议和TLS相关。
-OSI (Open System Interconnect) 先列一张能够体现不同协议在OSI七层模型中的表格
-   层级 层级名称 应用     7 应用层 例如HTTP、SMTP、SNMP、FTP、Telnet、SIP、SSH、NFS、RTSP、XMPP、Whois、ENRP、TLS   6 表示层 例如XDR、ASN.1、SMB、AFP、NCP   5 会话层 例如ASAP、ISO 8327 / CCITT X.225、RPC、NetBIOS、ASP、IGMP、Winsock、BSD sockets   4 传输层 例如TCP、UDP、RTP、SCTP、SPX、ATP、IL   3 网络层 例如IP、ICMP、IPX、BGP、OSPF、RIP、IGRP、EIGRP、ARP、RARP、X.25   2 数据链路层 例如以太网、令牌环、HDLC、帧中继、ISDN、ATM、IEEE 802.11、FDDI、PPP   1 物理层 例如线路、无线电、光纤    先从 TCP/IP 说起  IPS（Internet Protocol Suite）又叫做互联网协议套件、是一套网络传输协议家族，也就是我们熟悉的TCP/IP协议族，（又因为TCP、IP为不同层级的协议，当多个层级的协议共同工作时类似计算机科学中的堆栈、所以又叫做TCP/IP协议栈）
- TCP/IP 中包含一系列用于处理数据通信的协议</description>
-    </item>
-    
-    <item>
       <title>我们应该如何优化网络层</title>
       <link>http://example.org/posts/network-layer-optimization/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Sat, 11 May 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/network-layer-optimization/</guid>
       <description>Network Layer Optimization 网络层优化方案
@@ -46,6 +34,18 @@ HTTP  Keep-Alive 复用TCP链接 Pipeline 管道化请求，是我们无需等�
 业务方面 很多大列表类似的数据尽量使用分页处理，在用户重复频繁的访问某个页面的时候尤其有用，详情数据和列表数据内容可以做区分，列表页只返回最小化的数据更加有利于用户体验
 对于内嵌的HTML等资源做缓存，避免每次都请求，一般可以使用if-modify或是其他的标记来做
 当某个api请求失败后，如果并不是post等对数据更改的接口可以使用多次重试机制</description>
+    </item>
+    
+    <item>
+      <title>HTTPS</title>
+      <link>http://example.org/posts/https/</link>
+      <pubDate>Wed, 27 Mar 2019 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/https/</guid>
+      <description>HTTPS 最近又看了一遍 [HTTP权威指南]，每次想写个总结的时候都会拖延症爆发，今天决定简单总结下我们日常使用的的网络传输协议和TLS相关。
+OSI (Open System Interconnect) 先列一张能够体现不同协议在OSI七层模型中的表格
+   层级 层级名称 应用     7 应用层 例如HTTP、SMTP、SNMP、FTP、Telnet、SIP、SSH、NFS、RTSP、XMPP、Whois、ENRP、TLS   6 表示层 例如XDR、ASN.1、SMB、AFP、NCP   5 会话层 例如ASAP、ISO 8327 / CCITT X.225、RPC、NetBIOS、ASP、IGMP、Winsock、BSD sockets   4 传输层 例如TCP、UDP、RTP、SCTP、SPX、ATP、IL   3 网络层 例如IP、ICMP、IPX、BGP、OSPF、RIP、IGRP、EIGRP、ARP、RARP、X.25   2 数据链路层 例如以太网、令牌环、HDLC、帧中继、ISDN、ATM、IEEE 802.11、FDDI、PPP   1 物理层 例如线路、无线电、光纤    先从 TCP/IP 说起  IPS（Internet Protocol Suite）又叫做互联网协议套件、是一套网络传输协议家族，也就是我们熟悉的TCP/IP协议族，（又因为TCP、IP为不同层级的协议，当多个层级的协议共同工作时类似计算机科学中的堆栈、所以又叫做TCP/IP协议栈）
+ TCP/IP 中包含一系列用于处理数据通信的协议</description>
     </item>
     
   </channel>

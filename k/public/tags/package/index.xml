@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Wed, 19 Feb 2020 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 16 Jun 2018 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/package/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>cocoapods</title>
       <link>http://example.org/posts/cocoapods/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Sat, 16 Jun 2018 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/cocoapods/</guid>
       <description>CocoaPods CocoaPods是OS X和iOS下的一个第三类库管理工具，通过CocoaPods工具我们可以为项目添加被称为“Pods”的依赖库（这些类库必须是CocoaPods本身所支持的），并且可以轻松管理其版本。

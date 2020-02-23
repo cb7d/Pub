@@ -7,15 +7,38 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>All rights reserved - 2020</copyright>
-    <lastBuildDate>Fri, 21 Feb 2020 10:46:42 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 11 Jun 2019 10:46:42 +0800</lastBuildDate>
     
 	<atom:link href="http://example.org/tags/thread/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Runloop 运行循环</title>
+      <link>http://example.org/posts/runloop/</link>
+      <pubDate>Tue, 11 Jun 2019 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/runloop/</guid>
+      <description>RunLoop 什么是RunLoop？
+ A RunLoop object processes input for sources such as mouse and keyboard events from the window system, Port objects, and NSConnection objects. A RunLoop object also processes Timer events. Your application neither creates or explicitly manages RunLoop objects. Each Thread object—including the application’s main thread—has an RunLoop object automatically created for it as needed. If you need to access the current thread’s run loop, you do so with the class method current.</description>
+    </item>
+    
+    <item>
+      <title>iOS 中的锁🔒</title>
+      <link>http://example.org/posts/lock/</link>
+      <pubDate>Sun, 21 Apr 2019 10:46:42 +0800</pubDate>
+      
+      <guid>http://example.org/posts/lock/</guid>
+      <description>Lock 之前总结了atomic的安全性问题，那么在诸如此类的并发使用资源的情况下该如何保证线程安全呢，这篇主要想总结下各种锁的使用
+还使用之前电影院卖票的栗子来说明
+Theater.h
+@interface Theater : NSObject @property (nonatomic, assign) NSInteger ticketNum; @end main.m
+int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Theater *theater = [[Theater alloc] init]; // 定义总票数为2000  theater.ticketNum = 2000; // 并发队列用于卖票  dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作  for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
+    </item>
+    
+    <item>
       <title>GCD (ObjC)</title>
       <link>http://example.org/posts/gcd_objc/</link>
-      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Mon, 25 Mar 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/gcd_objc/</guid>
       <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在ObjC中的使用，文中示例代码
@@ -35,7 +58,7 @@ int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here
     <item>
       <title>GCD (Swift)</title>
       <link>http://example.org/posts/gcd_swift/</link>
-      <pubDate>Fri, 21 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Mon, 25 Mar 2019 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/gcd_swift/</guid>
       <description>Grand Central Dispatch 这篇文主要想总结下 GCD 在swift中的使用，文中示例代码
@@ -56,7 +79,7 @@ git clone https://github.com/FelixScat/demo_GCD.git cd swiftGCD swift package ge
     <item>
       <title>Autoreleasepool 原理探究</title>
       <link>http://example.org/posts/autoreleasepool/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Sat, 12 May 2018 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/autoreleasepool/</guid>
       <description>Autoreleasepool 我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
@@ -67,22 +90,9 @@ CoreFoundation`objc_autoreleasePoolPop: -&amp;gt; 0x110d7e614 &amp;lt;+0&amp;gt;
     </item>
     
     <item>
-      <title>iOS 中的锁🔒</title>
-      <link>http://example.org/posts/lock/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
-      
-      <guid>http://example.org/posts/lock/</guid>
-      <description>Lock 之前总结了atomic的安全性问题，那么在诸如此类的并发使用资源的情况下该如何保证线程安全呢，这篇主要想总结下各种锁的使用
-还使用之前电影院卖票的栗子来说明
-Theater.h
-@interface Theater : NSObject @property (nonatomic, assign) NSInteger ticketNum; @end main.m
-int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here...  Theater *theater = [[Theater alloc] init]; // 定义总票数为2000  theater.ticketNum = 2000; // 并发队列用于卖票  dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作  for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
-    </item>
-    
-    <item>
       <title>ObjC 中的原子性</title>
       <link>http://example.org/posts/atomic/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
+      <pubDate>Fri, 11 May 2018 10:46:42 +0800</pubDate>
       
       <guid>http://example.org/posts/atomic/</guid>
       <description>atomic 前言 在使用 @property 修饰成员变量的时候，会设置一个默认的缺省值 atomic
@@ -91,16 +101,6 @@ int main(int argc, const char * argv[]) { @autoreleasepool { // insert code here
 安全性证明 首先定义一个电影院类，向电影院添加一个总票数的属性
 #import &amp;lt;Foundation/Foundation.h&amp;gt;  NS_ASSUME_NONNULL_BEGIN @interface Theater : NSObject @property (atomic, assign) NSInteger ticketNum; @end NS_ASSUME_NONNULL_END 接下来我们模拟卖票的过程
 Theater *theater = [[Theater alloc] init]; // 定义总票数为2000 theater.ticketNum = 2000; // 并发队列用于卖票 dispatch_queue_t concurrentQueue = dispatch_queue_create(&amp;#34;com.test.example0&amp;#34;, DISPATCH_QUEUE_CONCURRENT); // 将总票数分为4部分分别添加到并发队列执行卖票操作 for (int i = 0; i &amp;lt; 4; i++) { dispatch_async(concurrentQueue, ^{ for (int i = 0; i &amp;lt; 500; i++) { theater.</description>
-    </item>
-    
-    <item>
-      <title>Runloop 运行循环</title>
-      <link>http://example.org/posts/runloop/</link>
-      <pubDate>Wed, 19 Feb 2020 10:46:42 +0800</pubDate>
-      
-      <guid>http://example.org/posts/runloop/</guid>
-      <description>RunLoop 什么是RunLoop？
- A RunLoop object processes input for sources such as mouse and keyboard events from the window system, Port objects, and NSConnection objects. A RunLoop object also processes Timer events. Your application neither creates or explicitly manages RunLoop objects. Each Thread object—including the application’s main thread—has an RunLoop object automatically created for it as needed. If you need to access the current thread’s run loop, you do so with the class method current.</description>
     </item>
     
   </channel>
