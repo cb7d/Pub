@@ -1,3 +1,11 @@
+---
+title: "Autoreleasepool 原理探究"
+date: 2018-05-12T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC","thread"]
+---
+
 # Autoreleasepool
 
 我们可以看到我们项目中的main.m中声明了这个关键字，autoreleasepool，它是干什么用的呢
@@ -14,7 +22,6 @@ int main(int argc, char * argv[]) {
 
 ```objectivec
 - (void)someBussiness {
-    
     
     NSString *str = @"123";
     

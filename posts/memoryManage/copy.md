@@ -1,3 +1,11 @@
+---
+title: "浅谈 ObjC 中的几种copy"
+date: 2018-06-19T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC","memory"]
+---
+
 # Copy
 
 拷贝是我们在开发中经常使用的技巧，这里指的不是到Github上去复制粘贴代码，而是对内存中对象的操作 (逃

@@ -1,3 +1,11 @@
+---
+title: "KVC 键值编码"
+date: 2019-04-13T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC"]
+---
+
 # Key-value coding
 
 > Key-value coding is a mechanism enabled by the NSKeyValueCoding informal protocol that objects adopt to provide indirect access to their properties. When an object is key-value coding compliant, its properties are addressable via string parameters through a concise, uniform messaging interface. This indirect access mechanism supplements the direct access afforded by instance variables and their associated accessor methods.

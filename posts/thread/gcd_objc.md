@@ -1,3 +1,11 @@
+---
+title: "GCD (ObjC)"
+date: 2019-03-25T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC","Thread"]
+---
+
 # Grand Central Dispatch
 
 这篇文主要想总结下 `GCD` 在`ObjC`中的使用，[文中示例代码](https://github.com/FelixScat/demo_GCD)

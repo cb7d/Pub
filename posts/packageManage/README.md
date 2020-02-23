@@ -1,3 +1,11 @@
+---
+title: "cocoapods"
+date: 2018-06-16T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC","Swift","Package"]
+---
+
 # CocoaPods
 
 CocoaPods是OS X和iOS下的一个第三类库管理工具，通过CocoaPods工具我们可以为项目添加被称为“Pods”的依赖库（这些类库必须是CocoaPods本身所支持的），并且可以轻松管理其版本。

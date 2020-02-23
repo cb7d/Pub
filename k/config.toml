@@ -2,40 +2,37 @@ baseURL = "http://example.org/"
 languageCode = "en-us"
 title = "Cb7d"
 theme = "sam"
-pygmentsStyle            = "monokai"                        # https://help.farbox.com/pygments.html
-pygmentsCodefences       = true
-paginate = 5
+pygmentsStyle = "monokai" # https://help.farbox.com/pygments.html
+pygmentsCodefences = true
+paginate = 3
 disqusShortname = "YOUR_SHORT_NAME_HERE"
 copyright = "All rights reserved - 2020"
 canonifyurls = true
 
 [params]
-    dateform             = "Mon Jan 02, 2006"
-    dateformfull         = "Mon Jan 2 2006 15:04:05 EST"
-    favicon              = "sam.ico"
-    homepage             = "main"                           # What to call the home page link
-    footerText           = "Cb7d 's blog."
-
+dateform = "Mon Jan 02, 2006"
+dateformfull = "Mon Jan 2 2006 15:04:05 EST"
+favicon = "https://min.felixplus.top/public/icon/man_icon_square.JPG?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ZYHZHANGYUNHAO931119%2F20200223%2F%2Fs3%2Faws4_request&X-Amz-Date=20200223T024742Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=c5cfbe0ee2c297b46bcf68413178d4f0752d10171e51fe31713b02384b2617e3"
+homepage = "main" # What to call the home page link
+footerText = "Cb7d 's blog. cb7d23@gmail.com"
 # Metadata for Open Graph and Twitter
-    description          = "A new Hugo site."               # Max 160 characters show in search results
-    images               = ["tn.png"]                       # Image that shows on Twitter cards and Open Graph links to the site
-    title                = "Cb7d"
+description = "Cb7d 's blog" # Max 160 characters show in search results
+images = [
+    "tn.png"
+] # Image that shows on Twitter cards and Open Graph links to the site
+title = "Cb7d 's blog"
 
 [[params.mainMenu]]
-    link = "/posts"
-    text = "posts"
+link = "/posts"
+text = "Posts"
 
 [[params.mainMenu]]
-    link = "/gallery"
-    text = "gallery"
+link = "/tags/objc/"
+text = "Arithmetic"
 
 [[params.mainMenu]]
-    link = "/portfolio"
-    text = "portfolio"
-
-[[params.mainMenu]]
-    link = "/about"
-    text = "who is Cb7d?"
+link = "/about"
+text = "Who is Cb7d?"
 
 [imaging]
-    quality = 75
+quality = 75

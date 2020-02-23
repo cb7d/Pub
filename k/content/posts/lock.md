@@ -1,0 +1,1 @@
+../../../posts/thread/lock.md

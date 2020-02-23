@@ -1,0 +1,1 @@
+../../../posts/architecturalPattern/mvvm.md

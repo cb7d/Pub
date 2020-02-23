@@ -1,3 +1,11 @@
+---
+title: "KVO 键值监听"
+date: 2019-04-17T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","iOS","ObjC"]
+---
+
 # Key-Value Observing
 
 键值观察，是设计模式中观察者模式的实现

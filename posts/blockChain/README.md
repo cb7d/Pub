@@ -1,3 +1,11 @@
+---
+title: "用Swift写个简单的区块链系统"
+date: 2018-05-14T10:46:42+08:00
+showDate: true
+draft: false
+tags: ["blog","Swift","BlockChain"]
+---
+
 # BlockChainServer
 
 [源码地址](https://github.com/FelixScat/blockChainServer)
