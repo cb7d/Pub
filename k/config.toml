@@ -1,4 +1,4 @@
-baseURL = "http://localhost/"
+baseURL = "https://book.felixplus.top/"
 languageCode = "en-us"
 title = "Cb7d"
 theme = "sam"
