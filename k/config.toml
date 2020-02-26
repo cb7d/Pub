@@ -27,7 +27,7 @@ link = "/posts"
 text = "Posts"
 
 [[params.mainMenu]]
-link = "/tags/objc/"
+link = "/tags/arithmetic/"
 text = "Arithmetic"
 
 [[params.mainMenu]]
